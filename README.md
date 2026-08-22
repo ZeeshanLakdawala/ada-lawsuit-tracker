@@ -81,7 +81,15 @@ case_url
 
 The endpoint handles the batch record by record. Duplicates are skipped by `case_number`; invalid rows are counted as rejected.
 
-To trigger CourtListener pages 1-20 through the Bright Data collector, add these to `.env.local`:
+For daily scheduled runs, keep Bright Data input set to CourtListener page 1:
+
+```text
+https://www.courtlistener.com/?q=&type=r&order_by=dateFiled+desc&nature_of_suit=446&page=1
+```
+
+When page 1 has only new cases, `/api/ingest` triggers page 2 internally. It keeps scanning one page at a time until it finds a duplicate case number, sees an empty page, or reaches the max page cap.
+
+Add these to `.env.local`:
 
 ```bash
 BRIGHTDATA_API_TOKEN=...
@@ -91,7 +99,7 @@ BRIGHTDATA_COLLECTOR_ID=c_mt1pq36661zec4ol4
 Then run:
 
 ```bash
-pnpm brightdata:trigger -- --start=1 --pages=20
+pnpm brightdata:trigger -- --start=1 --pages=1
 ```
 
 The script sends explicit input URLs to Bright Data. That is how the run knows where to stop.
@@ -99,13 +107,7 @@ The script sends explicit input URLs to Bright Data. That is how the run knows w
 To trigger, poll Bright Data until results are ready, and then post the result into `/api/ingest`:
 
 ```bash
-pnpm brightdata:run-ingest -- --start=1 --pages=20
-```
-
-To create the JSON inputs for a scheduled Bright Data run:
-
-```bash
-pnpm brightdata:schedule-inputs -- --start=1 --pages=20
+pnpm brightdata:run-ingest -- --start=1 --pages=1
 ```
 
 To clear the `cases` table during test setup:

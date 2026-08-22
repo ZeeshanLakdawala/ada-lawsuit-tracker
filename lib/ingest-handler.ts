@@ -1,8 +1,19 @@
 import { NextResponse } from "next/server";
 import type { CasesRepository } from "@/lib/cases-repository";
-import { ingestCases, type Classifier } from "@/lib/ingest";
+import { ingestCases, type Classifier, type IngestResult } from "@/lib/ingest";
 
-export function createIngestPost(repository: CasesRepository, classifier?: Classifier) {
+type IngestPostOptions = {
+  classifier?: Classifier;
+  onAllNew?: (result: IngestResult, payload: unknown) => void;
+};
+
+export function createIngestPost(
+  repository: CasesRepository,
+  classifierOrOptions?: Classifier | IngestPostOptions
+) {
+  const options: IngestPostOptions =
+    typeof classifierOrOptions === "function" ? { classifier: classifierOrOptions } : classifierOrOptions ?? {};
+
   return async function ingestPost(request: Request) {
     let payload: unknown;
 
@@ -19,15 +30,22 @@ export function createIngestPost(repository: CasesRepository, classifier?: Class
     }
 
     try {
-      const result = await ingestCases(payload, repository, classifier);
+      const result = await ingestCases(payload, repository, options.classifier, { stopOnDuplicate: true });
 
       if (result.inserted === 0 && result.skipped === 0) {
         return NextResponse.json({ error: "No valid records" }, { status: 400 });
       }
 
+      if (result.inserted > 0 && !result.sawDuplicate) {
+        options.onAllNew?.(result, payload);
+      }
+
       return NextResponse.json({
         inserted: result.inserted,
-        skipped: result.skipped
+        skipped: result.skipped,
+        rejected: result.rejected,
+        sawDuplicate: result.sawDuplicate,
+        continuationQueued: result.inserted > 0 && !result.sawDuplicate && Boolean(options.onAllNew)
       });
     } catch (error) {
       const message = getErrorMessage(error);

@@ -1,7 +1,7 @@
 import { readEnvFile } from "./env.mjs";
 
 export const DEFAULT_BRIGHTDATA_START_PAGE = 1;
-export const DEFAULT_BRIGHTDATA_PAGES = 20;
+export const DEFAULT_BRIGHTDATA_PAGES = 1;
 
 export function getBrightDataConfig() {
   const env = readEnvFile();

@@ -7,16 +7,25 @@ export type IngestResult = {
   inserted: number;
   skipped: number;
   rejected: number;
+  sawDuplicate: boolean;
+  duplicateCaseNumber?: string;
+  processed: number;
 };
 
 export type Classifier = (defendant: string, caseName: string) => Promise<Industry>;
 
+export type IngestOptions = {
+  stopOnDuplicate?: boolean;
+};
+
 export async function ingestCases(
   payload: unknown,
   repository: CasesRepository,
-  classifier: Classifier = classifyIndustry
+  classifier: Classifier = classifyIndustry,
+  options: IngestOptions = {}
 ): Promise<IngestResult> {
   const records = extractCaseRecords(payload);
+  const stopOnDuplicate = options.stopOnDuplicate ?? true;
 
   if (records.length === 0) {
     throw new Error("Payload must include Bright Data page objects with non-empty cases arrays");
@@ -26,25 +35,42 @@ export async function ingestCases(
     .map((record) => normalizeRecord(record as RawCaseRecord))
     .filter((record) => record !== null);
 
-  const results = await Promise.all(
-    normalized.map(async (record) => {
-      const existing = await repository.findByCaseNumber(record.case_number);
+  let inserted = 0;
+  let skipped = 0;
+  let duplicateCaseNumber: string | undefined;
 
-      if (existing) {
-        return "skipped" as const;
+  for (const record of normalized) {
+    const existing = await repository.findByCaseNumber(record.case_number);
+
+    if (existing) {
+      skipped += 1;
+      duplicateCaseNumber = record.case_number;
+
+      if (stopOnDuplicate) {
+        break;
       }
 
-      const industry = await classifier(record.defendant, record.case_name);
-      await repository.insert({ ...record, industry });
-      return "inserted" as const;
-    })
-  );
+      continue;
+    }
 
-  return {
-    inserted: results.filter((result) => result === "inserted").length,
-    skipped: results.filter((result) => result === "skipped").length,
-    rejected: records.length - normalized.length
+    const industry = await classifier(record.defendant, record.case_name);
+    await repository.insert({ ...record, industry });
+    inserted += 1;
+  }
+
+  const result: IngestResult = {
+    inserted,
+    skipped,
+    rejected: records.length - normalized.length,
+    sawDuplicate: skipped > 0,
+    processed: inserted + skipped
   };
+
+  if (duplicateCaseNumber) {
+    result.duplicateCaseNumber = duplicateCaseNumber;
+  }
+
+  return result;
 }
 
 export function extractCaseRecords(payload: unknown): unknown[] {

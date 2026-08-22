@@ -24,7 +24,13 @@ describe("POST /api/ingest", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ inserted: 1, skipped: 0 });
+    expect(await response.json()).toEqual({
+      inserted: 1,
+      skipped: 0,
+      rejected: 0,
+      sawDuplicate: false,
+      continuationQueued: false
+    });
   });
 
   it("accepts Bright Data aliases inside nested cases", async () => {
@@ -53,7 +59,13 @@ describe("POST /api/ingest", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ inserted: 1, skipped: 0 });
+    expect(await response.json()).toEqual({
+      inserted: 1,
+      skipped: 0,
+      rejected: 0,
+      sawDuplicate: false,
+      continuationQueued: false
+    });
     expect(repository.records[0]).toMatchObject({
       case_number: "1:26-cv-07125",
       district: "S.D.N.Y",
@@ -86,7 +98,13 @@ describe("POST /api/ingest", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ inserted: 1, skipped: 0 });
+    expect(await response.json()).toEqual({
+      inserted: 1,
+      skipped: 0,
+      rejected: 0,
+      sawDuplicate: false,
+      continuationQueued: false
+    });
     expect(repository.records[0]).toMatchObject({
       case_number: "1:26-cv-25447",
       defendant: "A&Y RESTAURANT"
@@ -107,5 +125,44 @@ describe("POST /api/ingest", () => {
         ]
       }
     ]);
+  });
+
+  it("queues continuation only when the page has all new records", async () => {
+    const repository = new MemoryCasesRepository();
+    const calls: unknown[] = [];
+    const post = createIngestPost(repository, {
+      classifier: async () => "Ecommerce",
+      onAllNew: (result) => calls.push(result)
+    });
+    const response = await post(
+      new Request("http://localhost/api/ingest", {
+        method: "POST",
+        body: JSON.stringify([{ cases: [record] }])
+      })
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ continuationQueued: true });
+    expect(calls).toHaveLength(1);
+  });
+
+  it("does not queue continuation when a duplicate appears", async () => {
+    const repository = new MemoryCasesRepository();
+    await repository.insert({ ...record, industry: "Ecommerce" });
+    const calls: unknown[] = [];
+    const post = createIngestPost(repository, {
+      classifier: async () => "Ecommerce",
+      onAllNew: (result) => calls.push(result)
+    });
+    const response = await post(
+      new Request("http://localhost/api/ingest", {
+        method: "POST",
+        body: JSON.stringify([{ cases: [record] }])
+      })
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ sawDuplicate: true, continuationQueued: false });
+    expect(calls).toHaveLength(0);
   });
 });

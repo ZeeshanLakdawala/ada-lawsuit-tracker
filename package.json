@@ -9,7 +9,6 @@
     "lint": "next lint",
     "test": "vitest run",
     "check:supabase": "node scripts/check-supabase.mjs",
-    "brightdata:schedule-inputs": "node scripts/brightdata-schedule-inputs.mjs",
     "brightdata:trigger": "node scripts/trigger-brightdata.mjs",
     "brightdata:run-ingest": "node scripts/brightdata-run-ingest.mjs",
     "db:clear-cases": "node scripts/clear-cases.mjs",
