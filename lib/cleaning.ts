@@ -8,8 +8,8 @@ export function cleanText(value: unknown): string {
   return value.trim().replace(/[.,;:]+$/u, "").trim();
 }
 
-export function cleanCaseName(value: unknown): string {
-  return cleanText(cleanText(value).split("(")[0]);
+export function cleanCaseName(name: string) {
+  return name.split("(")[0].trim();
 }
 
 export function normalizeDate(value: unknown): string | null {
@@ -29,7 +29,7 @@ export function normalizeDate(value: unknown): string | null {
 export function normalizeRecord(raw: RawCaseRecord): CaseRecordInput | null {
   const dateFiled = normalizeDate(raw.date_filed);
   const record = {
-    case_name: cleanCaseName(raw.case_name),
+    case_name: cleanCaseName(cleanText(raw.case_name)),
     defendant: cleanText(raw.defendant),
     plaintiff: cleanText(raw.plaintiff),
     district: cleanText(raw.district),

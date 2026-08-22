@@ -19,7 +19,7 @@ describe("ingestCases", () => {
 
     expect(result).toEqual({ inserted: 1, skipped: 0, rejected: 0 });
     expect(repository.records[0]).toMatchObject({
-      case_name: "Jane Doe v Example Store Inc",
+      case_name: "Jane Doe v Example Store Inc.",
       industry: "Ecommerce"
     });
   });

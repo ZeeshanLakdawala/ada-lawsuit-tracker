@@ -12,7 +12,7 @@ export function parseIndustry(value: string | null | undefined): Industry {
   return "Other";
 }
 
-export async function classifyIndustry(defendant: string): Promise<Industry> {
+export async function classifyIndustry(defendant: string, caseName = ""): Promise<Industry> {
   if (!defendant.trim()) {
     return "Other";
   }
@@ -23,20 +23,13 @@ export async function classifyIndustry(defendant: string): Promise<Industry> {
     return "Other";
   }
 
-  const prompt = `You are classifying entities into predefined industries.
-
-Categories:
+  const prompt = `Classify the company into one of these categories:
 [Ecommerce, SaaS, Healthcare, Finance, Education, Hospitality, Government, Other]
 
-Rules:
-- Return ONLY one category
-- No explanation
-- If unsure -> closest category
-- If individual -> Other
+Company: ${defendant}
+Case: ${caseName}
 
-Defendant: ${defendant}
-
-Answer:`;
+Return ONLY one category.`;
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {

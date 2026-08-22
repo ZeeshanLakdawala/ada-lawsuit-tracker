@@ -9,7 +9,7 @@ export type IngestResult = {
   rejected: number;
 };
 
-export type Classifier = (defendant: string) => Promise<Industry>;
+export type Classifier = (defendant: string, caseName: string) => Promise<Industry>;
 
 export async function ingestCases(
   payload: unknown,
@@ -32,7 +32,7 @@ export async function ingestCases(
         return "skipped" as const;
       }
 
-      const industry = await classifier(record.defendant);
+      const industry = await classifier(record.defendant, record.case_name);
       await repository.insert({ ...record, industry });
       return "inserted" as const;
     })
