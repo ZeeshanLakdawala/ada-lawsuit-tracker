@@ -12,6 +12,12 @@ export function cleanCaseName(name: string) {
   return name.split("(")[0].trim();
 }
 
+export function extractPlaintiffFromCaseName(caseName: string): string {
+  const cleaned = cleanCaseName(cleanText(caseName));
+  const match = cleaned.match(/^(.+?)\s+v\.?\s+/iu);
+  return cleanText(match?.[1]);
+}
+
 export function cleanUrl(value: unknown): string {
   const text = cleanText(value);
   const markdownLink = text.match(/\[(https?:\/\/[^\]\s]+)\]\(https?:\/\/[^\)]+\)/u);
@@ -77,10 +83,13 @@ function parseMonthNameDate(value: string): string | null {
 
 export function normalizeRecord(raw: RawCaseRecord): CaseRecordInput | null {
   const dateFiled = normalizeDate(raw.date_filed);
+  const caseName = cleanCaseName(cleanText(raw.case_name));
+  const rawPlaintiff = cleanText(raw.plaintiff ?? raw.plaintiff_name);
+  const parsedPlaintiff = extractPlaintiffFromCaseName(caseName);
   const record = {
-    case_name: cleanCaseName(cleanText(raw.case_name)),
+    case_name: caseName,
     defendant: cleanText(raw.defendant ?? raw.defendant_name),
-    plaintiff: cleanText(raw.plaintiff ?? raw.plaintiff_name),
+    plaintiff: isPartyNameFragment(rawPlaintiff) && parsedPlaintiff ? parsedPlaintiff : rawPlaintiff,
     district: cleanText(raw.district ?? raw.court),
     date_filed: dateFiled ?? "",
     case_number: cleanText(raw.case_number ?? raw.docket_number),
@@ -96,4 +105,8 @@ export function normalizeRecord(raw: RawCaseRecord): CaseRecordInput | null {
   }
 
   return record;
+}
+
+function isPartyNameFragment(value: string) {
+  return ["inc", "llc", "ltd", "corp", "co", "company"].includes(value.toLowerCase().replace(/\./g, ""));
 }

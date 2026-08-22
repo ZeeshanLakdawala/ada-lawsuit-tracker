@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { cleanCaseName, cleanText, cleanUrl, normalizeDate, normalizeRecord } from "@/lib/cleaning";
+import {
+  cleanCaseName,
+  cleanText,
+  cleanUrl,
+  extractPlaintiffFromCaseName,
+  normalizeDate,
+  normalizeRecord
+} from "@/lib/cleaning";
 
 describe("cleaning", () => {
   it("removes parenthetical suffix from case name", () => {
@@ -61,6 +68,27 @@ describe("cleaning", () => {
       case_number: "1:26-cv-07125",
       case_url: "https://www.courtlistener.com/docket/74681587/benavides-moran-v-ana-luisa-retail-llc/"
     });
+  });
+
+  it("uses case name when Bright Data gives a plaintiff suffix fragment", () => {
+    expect(
+      normalizeRecord({
+        case_name: "Benavides Moran v. Scandinavian Designs, Inc. (S.D.N.Y. 2026)",
+        defendant_name: "Scandinavian Designs",
+        plaintiff_name: "Inc.",
+        court: "S.D.N.Y.",
+        date_filed: "August 21st, 2026",
+        docket_number: "1:26-cv-07126",
+        case_url: "https://example.com/case"
+      })
+    ).toMatchObject({
+      case_name: "Benavides Moran v. Scandinavian Designs, Inc.",
+      plaintiff: "Benavides Moran"
+    });
+  });
+
+  it("extracts plaintiff names from case names", () => {
+    expect(extractPlaintiffFromCaseName("Dena Peterson v. Bagelnow Bakeshop LLC")).toBe("Dena Peterson");
   });
 
   it("extracts a URL from markdown link text", () => {
