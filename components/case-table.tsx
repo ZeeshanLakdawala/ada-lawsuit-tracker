@@ -22,11 +22,11 @@ export function CaseTable({ cases }: { cases: CaseRecord[] }) {
         </TableHeader>
         <TableBody>
         {cases.map((caseRecord) => (
-          <TableRow key={caseRecord.id} className="transition-colors hover:bg-stone-100/80">
+          <TableRow key={caseRecord.id} className="group transition-colors hover:bg-stone-100/80">
             <TableCell>{caseRecord.date_filed}</TableCell>
             <TableCell>
               <Link
-                className="font-semibold text-teal-800 underline-offset-2 hover:underline focus-visible:underline"
+                className="font-semibold text-teal-800 underline-offset-2 group-hover:underline hover:underline focus-visible:underline"
                 href={`/case/${caseRecord.id}`}
               >
                 {caseRecord.defendant}
