@@ -27,13 +27,13 @@ export default async function CaseDetail({ params }: PageProps) {
   const related = await repository.relatedCases(caseRecord.district, caseRecord.id);
 
   return (
-    <main className="mx-auto w-[min(1040px,calc(100%-32px))] py-5 pb-10 max-[760px]:w-[min(100%-24px,100%)]">
+    <main className="mx-auto w-[min(920px,calc(100%-32px))] py-5 pb-10 max-[760px]:w-[min(100%-24px,100%)]">
       <section className="border-b border-stone-200 pb-6">
         <div className="min-w-0">
           <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-red-700">
             Federal ADA website filing
           </p>
-          <h1 className="max-w-[880px] text-[clamp(1.75rem,2.7vw,2.625rem)] font-semibold leading-[1.12] tracking-normal text-gray-950">
+          <h1 className="max-w-[760px] text-[clamp(1.65rem,2.4vw,2.25rem)] font-semibold leading-[1.12] tracking-normal text-gray-950">
             {caseRecord.case_name}
           </h1>
           <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-stone-600">
@@ -52,13 +52,13 @@ export default async function CaseDetail({ params }: PageProps) {
         </div>
       </section>
 
-      <section className="mt-6 grid grid-cols-[minmax(0,1fr)_320px] gap-6 max-[900px]:grid-cols-1">
+      <section className="mt-6 grid grid-cols-[minmax(0,1fr)_285px] gap-4 max-[820px]:grid-cols-1">
         <div className="grid gap-5">
           <Card className="rounded-lg border-stone-200 shadow-sm">
             <CardHeader className="p-5 pb-1">
               <CardTitle className="text-sm font-semibold uppercase tracking-[0.04em] text-stone-600">Parties</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-6 p-5 pt-4 max-[640px]:grid-cols-1">
+            <CardContent className="grid grid-cols-[minmax(0,1.2fr)_minmax(160px,0.8fr)] gap-x-4 gap-y-5 p-5 pt-4 max-[640px]:grid-cols-1">
               <PartyFact label="Defendant" value={caseRecord.defendant} />
               <PartyFact label="Plaintiff" value={caseRecord.plaintiff} />
             </CardContent>
@@ -70,7 +70,7 @@ export default async function CaseDetail({ params }: PageProps) {
                 Filing facts
               </CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-x-8 gap-y-5 p-5 pt-4 max-[640px]:grid-cols-1">
+            <CardContent className="grid grid-cols-[minmax(0,1fr)_minmax(160px,0.9fr)] gap-x-4 gap-y-5 p-5 pt-4 max-[640px]:grid-cols-1">
               <DetailFact label="Court" value={caseRecord.district} />
               <DetailFact label="Date filed" value={caseRecord.date_filed} />
               <DetailFact label="Case number" value={caseRecord.case_number} mono />
