@@ -24,10 +24,28 @@ export function createIngestPost(repository: CasesRepository, classifier?: Class
         skipped: result.skipped
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unexpected error";
+      const message = getErrorMessage(error);
       const status = message.includes("Payload") ? 400 : 500;
 
+      console.error("Ingest failed", error);
       return NextResponse.json({ error: message }, { status });
     }
   };
+}
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (
+    error &&
+    typeof error === "object" &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
+    return error.message;
+  }
+
+  return "Unexpected error";
 }

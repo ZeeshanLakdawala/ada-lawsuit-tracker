@@ -113,15 +113,15 @@ export class SupabaseCasesRepository implements CasesRepository {
   }
 
   async topPlaintiffs() {
-    return this.rpcCounts("top_plaintiffs");
+    return this.countColumn("plaintiff", { limit: 10 });
   }
 
   async topDistricts() {
-    return this.rpcCounts("top_districts");
+    return this.countColumn("district");
   }
 
   async industryDistribution() {
-    return this.rpcCounts("industry_distribution");
+    return this.countColumn("industry", { excludeOther: true });
   }
 
   async getById(id: string) {
@@ -166,14 +166,34 @@ export class SupabaseCasesRepository implements CasesRepository {
     return count ?? 0;
   }
 
-  private async rpcCounts(functionName: string) {
-    const { data, error } = await this.client.rpc(functionName);
+  private async countColumn(
+    column: "plaintiff" | "district" | "industry",
+    options: { excludeOther?: boolean; limit?: number } = {}
+  ) {
+    let query = this.client.from("cases").select(column);
+
+    if (options.excludeOther) {
+      query = query.neq(column, "Other");
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
-    return (data ?? []).map((row: { label: string; count: number }) => ({
-      label: row.label,
-      count: Number(row.count)
-    }));
+
+    const counts = new Map<string, number>();
+
+    for (const row of (data ?? []) as Array<Record<typeof column, string | null>>) {
+      const value = row[column];
+
+      if (typeof value === "string" && value) {
+        counts.set(value, (counts.get(value) ?? 0) + 1);
+      }
+    }
+
+    return Array.from(counts.entries())
+      .map(([label, count]) => ({ label, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, options.limit);
   }
 }
 
