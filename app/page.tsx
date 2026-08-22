@@ -7,35 +7,24 @@ import { buttonClasses } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getCasesRepository } from "@/lib/cases-repository";
+import { caseListPageHref, parseCaseListParams } from "@/lib/page-params";
 
 type SearchParams = Promise<{
   district?: string;
   industry?: string;
-  timeRange?: "7" | "30";
+  timeRange?: string;
   page?: string;
 }>;
 
-function pageHref(page: number, params: Awaited<SearchParams>) {
-  const next = new URLSearchParams();
-
-  if (params.district) next.set("district", params.district);
-  if (params.industry) next.set("industry", params.industry);
-  if (params.timeRange) next.set("timeRange", params.timeRange);
-  next.set("page", String(page));
-
-  return `/?${next.toString()}`;
-}
-
 export default async function Home({ searchParams }: { searchParams: SearchParams }) {
-  const params = await searchParams;
-  const page = Math.max(Number(params.page ?? 1), 1);
+  const params = parseCaseListParams(await searchParams);
   const repository = getCasesRepository();
-  const [casePage, metrics, plaintiffs, districts, industries, districtOptions] = await Promise.all([
+  const [initialCasePage, metrics, plaintiffs, districts, industries, districtOptions] = await Promise.all([
     repository.list({
       district: params.district,
       industry: params.industry,
       timeRange: params.timeRange,
-      page,
+      page: params.page,
       pageSize: 10
     }),
     repository.metrics(),
@@ -44,7 +33,18 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
     repository.industryDistribution(),
     repository.distinctDistricts()
   ]);
-  const totalPages = Math.max(Math.ceil(casePage.total / casePage.pageSize), 1);
+  const totalPages = Math.max(Math.ceil(initialCasePage.total / initialCasePage.pageSize), 1);
+  const currentPage = Math.min(params.page, totalPages);
+  const casePage =
+    params.page === currentPage
+      ? initialCasePage
+      : await repository.list({
+          district: params.district,
+          industry: params.industry,
+          timeRange: params.timeRange,
+          page: currentPage,
+          pageSize: 10
+        });
 
   return (
     <main className="mx-auto w-[min(1180px,calc(100%-32px))] py-8 pb-14">
@@ -84,13 +84,21 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
         />
         <CaseTable cases={casePage.cases} />
         <nav className="mt-4 flex items-center justify-between gap-3" aria-label="Pagination">
-          <Link className={buttonClasses("outline")} href={pageHref(page - 1, params)} aria-disabled={page <= 1}>
+          <Link
+            className={buttonClasses("outline")}
+            href={caseListPageHref(currentPage - 1, params)}
+            aria-disabled={currentPage <= 1}
+          >
             <ArrowLeft size={16} /> Previous
           </Link>
           <span className="text-sm text-stone-600">
-            Page {page} of {totalPages}
+            Page {currentPage} of {totalPages}
           </span>
-          <Link className={buttonClasses("outline")} href={pageHref(page + 1, params)} aria-disabled={page >= totalPages}>
+          <Link
+            className={buttonClasses("outline")}
+            href={caseListPageHref(currentPage + 1, params)}
+            aria-disabled={currentPage >= totalPages}
+          >
             Next <ArrowRight size={16} />
           </Link>
         </nav>

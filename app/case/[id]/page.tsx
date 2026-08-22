@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { buttonClasses } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCasesRepository } from "@/lib/cases-repository";
+import { isUuid } from "@/lib/page-params";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -11,6 +12,11 @@ type PageProps = {
 
 export default async function CaseDetail({ params }: PageProps) {
   const { id } = await params;
+
+  if (!isUuid(id)) {
+    notFound();
+  }
+
   const repository = getCasesRepository();
   const caseRecord = await repository.getById(id);
 
@@ -75,10 +81,6 @@ export default async function CaseDetail({ params }: PageProps) {
               <li className="flex justify-between gap-3 border-b border-stone-300 pb-2 text-sm">
               <span>Industry</span>
               <strong>{caseRecord.industry}</strong>
-            </li>
-              <li className="flex justify-between gap-3 border-b border-stone-300 pb-2 text-sm">
-              <span>Category</span>
-              <strong>ADA website</strong>
             </li>
             </ul>
           </CardContent>
