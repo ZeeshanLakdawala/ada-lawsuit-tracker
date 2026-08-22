@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ADA Website Lawsuit Tracker Promo</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #111827; }
+    .video { width: min(100vw, 1100px); aspect-ratio: 16 / 9; overflow: hidden; position: relative; background: #fbfaf7; color: #111827; }
+    .scene { display: none; position: absolute; inset: 0; padding: 7%; place-items: center; text-align: center; }
+    .scene.active { display: grid; }
+    .scene h1 { margin: 0; font-size: clamp(2rem, 6vw, 5rem); line-height: .95; letter-spacing: -.06em; }
+    .scene p { max-width: 680px; font-size: clamp(1rem, 2vw, 1.4rem); color: #57534e; }
+    .controls { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1px solid #374151; border-radius: 999px; background: #111827; color: #fff; }
+    button { border: 0; border-radius: 999px; padding: 7px 12px; cursor: pointer; }
+    .play { background: #087f78; color: #fff; }
+    .audio { background: #374151; color: #fff; }
+    .progress { width: 120px; height: 4px; background: #d6d3d1; border-radius: 99px; overflow: hidden; }
+    .progress i { display: block; width: 0; height: 100%; background: #e11d48; }
+  </style>
+</head>
+<body>
+  <main class="video" aria-label="ADA Website Lawsuit Tracker animated promo">
+    <!-- Design agent expands these timed scenes and wires the final music loop. -->
+    <section class="scene active" data-duration="4"><div><h1>Accessibility data,<br><span style="color:#087f78">made visible.</span></h1><p>ADA Website Lawsuit Tracker</p></div></section>
+    <section class="scene" data-duration="4"><div><h1>From public<br><span style="color:#e11d48">dockets</span> to signals.</h1><p>Collect filings from CourtListener and RECAP.</p></div></section>
+    <section class="scene" data-duration="5"><div><h1>Clean. Classify.<br><span style="color:#087f78">Count.</span></h1><p>Duplicate protection, industry labels, and useful metrics.</p></div></section>
+    <section class="scene" data-duration="5"><div><h1>Find the<br><span style="color:#e11d48">pattern.</span></h1><p>Search by industry and filing window. Explore plaintiffs, districts, and defendants.</p></div></section>
+    <section class="scene" data-duration="5"><div><h1>Open the<br><span style="color:#087f78">source.</span></h1><p>Every case leads back to its public filing record.</p></div></section>
+    <section class="scene" data-duration="4"><div><h1>See what is<br><span style="color:#e11d48">happening.</span></h1><p>ADA Website Lawsuit Tracker</p></div></section>
+  </main>
+  <nav class="controls" aria-label="Video controls">
+    <button class="play" type="button">Play</button>
+    <button class="audio" type="button">Music off</button>
+    <span class="progress" aria-hidden="true"><i></i></span>
+    <output aria-live="polite">Scene 1 / 6</output>
+  </nav>
+  <script>
+    const scenes = [...document.querySelectorAll('.scene')];
+    const play = document.querySelector('.play');
+    const audio = document.querySelector('.audio');
+    const progress = document.querySelector('.progress i');
+    const output = document.querySelector('output');
+    let index = 0;
+    let playing = false;
+    let startedAt = 0;
+    let frame;
+    const durations = scenes.map((scene) => Number(scene.dataset.duration) * 1000);
+    function render() { scenes.forEach((scene, i) => scene.classList.toggle('active', i === index)); output.textContent = `Scene ${index + 1} / ${scenes.length}`; }
+    function tick(now) { const elapsed = now - startedAt; const duration = durations[index]; progress.style.width = `${Math.min(100, elapsed / duration * 100)}%`; if (elapsed >= duration) { index = (index + 1) % scenes.length; startedAt = now; render(); } if (playing) frame = requestAnimationFrame(tick); }
+    play.addEventListener('click', () => { playing = !playing; play.textContent = playing ? 'Pause' : 'Play'; if (playing) { startedAt = performance.now(); frame = requestAnimationFrame(tick); } else cancelAnimationFrame(frame); });
+    audio.addEventListener('click', () => { audio.textContent = audio.textContent === 'Music off' ? 'Music on' : 'Music off'; });
+    render();
+  </script>
+</body>
+</html>
