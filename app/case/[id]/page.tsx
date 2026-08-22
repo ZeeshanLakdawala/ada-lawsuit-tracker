@@ -30,7 +30,7 @@ export default async function CaseDetail({ params }: PageProps) {
     <main className="mx-auto w-[min(920px,calc(100%-32px))] py-5 pb-10 max-[760px]:w-[min(100%-24px,100%)]">
       <Link className="mb-5 inline-flex items-center gap-1 text-xs font-medium text-stone-500 transition-colors hover:text-teal-700" href="/">
         <ArrowLeft className="h-3.5 w-3.5" />
-        Back to live tracker
+        Back to Live Tracker
       </Link>
       <section className="border-b border-stone-200 pb-6">
         <div className="min-w-0">
