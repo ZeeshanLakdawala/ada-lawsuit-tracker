@@ -54,3 +54,25 @@ Response:
 ```
 
 Invalid records are rejected inside the batch. A fully empty or fully invalid payload returns `400`.
+
+## Bright Data setup
+
+Set the Bright Data subscription webhook URL to:
+
+```text
+https://YOUR-VERCEL-DOMAIN/api/ingest
+```
+
+Send the scraper output as a JSON array. Each item must include:
+
+```text
+case_name
+defendant
+plaintiff
+district
+date_filed
+case_number
+case_url
+```
+
+The endpoint handles the batch record by record. Duplicates are skipped by `case_number`; invalid rows are counted as rejected.
