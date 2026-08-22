@@ -14,10 +14,14 @@ export type Industry = (typeof INDUSTRIES)[number];
 export type RawCaseRecord = {
   case_name?: unknown;
   defendant?: unknown;
+  defendant_name?: unknown;
   plaintiff?: unknown;
+  plaintiff_name?: unknown;
   district?: unknown;
+  court?: unknown;
   date_filed?: unknown;
   case_number?: unknown;
+  docket_number?: unknown;
   case_url?: unknown;
 };
 

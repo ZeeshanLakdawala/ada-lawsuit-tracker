@@ -7,9 +7,15 @@ export function createIngestPost(repository: CasesRepository, classifier?: Class
     let payload: unknown;
 
     try {
-      payload = await request.json();
+      payload = parseWebhookBody(await request.text());
     } catch {
-      return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+      return NextResponse.json(
+        {
+          error:
+            "Invalid JSON. Send a raw JSON array, not a markdown-formatted sample. Remove escaped underscores and unescaped line breaks inside string values."
+        },
+        { status: 400 }
+      );
     }
 
     try {
@@ -31,6 +37,15 @@ export function createIngestPost(repository: CasesRepository, classifier?: Class
       return NextResponse.json({ error: message }, { status });
     }
   };
+}
+
+export function parseWebhookBody(body: string) {
+  try {
+    return JSON.parse(body);
+  } catch {
+    const repaired = body.replace(/\\_/g, "_").replace(/[\r\n]+/g, " ");
+    return JSON.parse(repaired);
+  }
 }
 
 function getErrorMessage(error: unknown) {
