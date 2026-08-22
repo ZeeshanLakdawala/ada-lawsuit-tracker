@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { notFound } from "next/navigation";
-import { buttonClasses } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCasesRepository } from "@/lib/cases-repository";
 import { isUuid } from "@/lib/page-params";
@@ -29,7 +28,7 @@ export default async function CaseDetail({ params }: PageProps) {
 
   return (
     <main className="mx-auto w-[min(1520px,calc(100%-48px))] py-8 pb-14 max-[760px]:w-[min(100%-28px,100%)]">
-      <section className="flex items-start justify-between gap-8 border-b border-stone-300 pb-14 max-[860px]:block">
+      <section className="border-b border-stone-300 pb-14">
         <div className="min-w-0">
           <p className="mb-4 text-sm font-bold uppercase tracking-normal text-red-700">Federal ADA website filing</p>
           <h1 className="max-w-6xl text-5xl font-black leading-[0.98] tracking-normal text-gray-950 max-[760px]:text-4xl min-[1200px]:text-7xl">
@@ -41,22 +40,11 @@ export default async function CaseDetail({ params }: PageProps) {
             <MetaItem label="Case number" value={caseRecord.case_number} mono />
           </div>
         </div>
-        <a
-          className={buttonClasses(
-            "default",
-            "mt-4 shrink-0 bg-teal-700 text-base text-white hover:bg-teal-800 max-[860px]:mt-7"
-          )}
-          href={caseRecord.case_url}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Open filing <ExternalLink size={18} />
-        </a>
       </section>
 
       <section className="mt-14 grid grid-cols-[minmax(0,1fr)_minmax(320px,440px)] gap-14 max-[1040px]:grid-cols-1 max-[760px]:mt-8">
         <div className="grid gap-10">
-          <Card className="shadow-sm">
+          <Card className="rounded-[22px] border-[#d1d8e0] shadow-sm">
             <CardHeader className="p-9 pb-3 max-[760px]:p-6 max-[760px]:pb-2">
               <CardTitle className="text-2xl font-bold uppercase text-stone-600">Parties</CardTitle>
             </CardHeader>
@@ -66,7 +54,7 @@ export default async function CaseDetail({ params }: PageProps) {
             </CardContent>
           </Card>
 
-          <Card className="shadow-sm">
+          <Card className="rounded-[22px] border-[#d1d8e0] shadow-sm">
             <CardHeader className="p-9 pb-3 max-[760px]:p-6 max-[760px]:pb-2">
               <CardTitle className="text-2xl font-bold uppercase text-stone-600">Filing facts</CardTitle>
             </CardHeader>
@@ -75,6 +63,7 @@ export default async function CaseDetail({ params }: PageProps) {
               <DetailFact label="Date filed" value={caseRecord.date_filed} />
               <DetailFact label="Case number" value={caseRecord.case_number} mono />
               <DetailFact label="Industry" value={caseRecord.industry} />
+              <DetailLink label="External link" href={caseRecord.case_url} value={sourceLabel(caseRecord.case_url)} />
             </CardContent>
           </Card>
         </div>
@@ -113,9 +102,26 @@ function DetailFact({ label, value, mono = false }: { label: string; value: stri
   );
 }
 
+function DetailLink({ label, href, value }: { label: string; href: string; value: string }) {
+  return (
+    <div className="grid gap-2">
+      <span className="text-sm font-medium uppercase tracking-normal text-stone-500">{label}</span>
+      <a
+        className="inline-flex w-fit items-center gap-2 text-2xl font-medium text-blue-950"
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+      >
+        {value}
+        <ExternalLink className="h-5 w-5" />
+      </a>
+    </div>
+  );
+}
+
 function RelatedCasesCard({ district, related }: { district: string; related: CaseRecord[] }) {
   return (
-    <Card className="self-start shadow-sm">
+    <Card className="self-start rounded-[22px] border-[#d1d8e0] shadow-sm">
       <CardHeader className="p-8 pb-2">
         <CardTitle className="text-lg font-bold uppercase tracking-normal text-stone-600">
           Recent related filings in {district}
@@ -141,4 +147,13 @@ function RelatedCasesCard({ district, related }: { district: string; related: Ca
       </CardContent>
     </Card>
   );
+}
+
+function sourceLabel(url: string) {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    return host === "courtlistener.com" ? "CourtListener" : host;
+  } catch {
+    return "Open filing";
+  }
 }
