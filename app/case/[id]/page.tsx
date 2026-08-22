@@ -52,25 +52,25 @@ export default async function CaseDetail({ params }: PageProps) {
         </div>
       </section>
 
-      <section className="mt-6 grid grid-cols-[minmax(0,1fr)_285px] gap-4 max-[820px]:grid-cols-1">
-        <div className="grid gap-5">
+      <section className="mt-5 grid grid-cols-[minmax(0,1fr)_285px] gap-3 max-[820px]:grid-cols-1">
+        <div className="grid gap-3">
           <Card className="rounded-lg border-stone-200 shadow-sm">
-            <CardHeader className="p-5 pb-1">
+            <CardHeader className="p-4 pb-1">
               <CardTitle className="text-sm font-semibold uppercase tracking-[0.04em] text-stone-600">Parties</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-[minmax(0,1.2fr)_minmax(160px,0.8fr)] gap-x-4 gap-y-5 p-5 pt-4 max-[640px]:grid-cols-1">
+            <CardContent className="grid grid-cols-[minmax(0,1.2fr)_minmax(160px,0.8fr)] gap-x-3 gap-y-3 p-4 pt-3 max-[640px]:grid-cols-1">
               <PartyFact label="Defendant" value={caseRecord.defendant} />
               <PartyFact label="Plaintiff" value={caseRecord.plaintiff} />
             </CardContent>
           </Card>
 
           <Card className="rounded-lg border-stone-200 shadow-sm">
-            <CardHeader className="p-5 pb-1">
+            <CardHeader className="p-4 pb-1">
               <CardTitle className="text-sm font-semibold uppercase tracking-[0.04em] text-stone-600">
                 Filing facts
               </CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-[minmax(0,1fr)_minmax(160px,0.9fr)] gap-x-4 gap-y-5 p-5 pt-4 max-[640px]:grid-cols-1">
+            <CardContent className="grid grid-cols-[minmax(0,1fr)_minmax(160px,0.9fr)] gap-x-3 gap-y-3 p-4 pt-3 max-[640px]:grid-cols-1">
               <DetailFact label="Court" value={caseRecord.district} />
               <DetailFact label="Date filed" value={caseRecord.date_filed} />
               <DetailFact label="Case number" value={caseRecord.case_number} mono />
@@ -118,18 +118,18 @@ function DetailFact({ label, value, mono = false }: { label: string; value: stri
 function RelatedCasesCard({ district, related }: { district: string; related: CaseRecord[] }) {
   return (
     <Card className="self-start rounded-lg border-stone-200 shadow-sm">
-      <CardHeader className="p-5 pb-2">
+      <CardHeader className="p-4 pb-2">
         <CardTitle className="text-xs font-semibold uppercase tracking-[0.05em] text-stone-600">
           Recent related filings in {district}
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-5 pt-3">
+      <CardContent className="p-4 pt-3">
         {related.length === 0 ? (
           <p className="py-5 text-sm text-stone-500">No related cases in this district yet.</p>
         ) : (
           <ul>
             {related.slice(0, 5).map((item) => (
-              <li key={item.id} className="border-b border-stone-200 py-3 first:pt-0 last:border-b-0 last:pb-0">
+            <li key={item.id} className="border-b border-stone-200 py-2.5 first:pt-0 last:border-b-0 last:pb-0">
                 <Link className="text-sm font-medium leading-snug text-blue-950" href={`/case/${item.id}`}>
                   {item.defendant}
                 </Link>
