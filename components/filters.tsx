@@ -1,27 +1,58 @@
+"use client";
+
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
 import { INDUSTRIES } from "@/lib/types";
 
 type FiltersProps = {
-  districts: string[];
-  district?: string;
+  courts: string[];
+  court?: string;
   industry?: string;
   timeRange?: string;
 };
 
-export function Filters({ districts, district, industry, timeRange }: FiltersProps) {
+export function Filters({ courts, court, industry, timeRange }: FiltersProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const hasFilters = Boolean(court || industry || timeRange);
+
+  function updateFilter(name: "district" | "industry" | "timeRange", value: string) {
+    const params = new URLSearchParams();
+
+    if (name !== "district" && court) params.set("district", court);
+    if (name !== "industry" && industry) params.set("industry", industry);
+    if (name !== "timeRange" && timeRange) params.set("timeRange", timeRange);
+    if (value) params.set(name, value);
+    params.set("page", "1");
+
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }
+
+  function clearFilters() {
+    router.replace(pathname, { scroll: false });
+  }
+
   return (
-    <form className="mb-4 flex flex-wrap gap-3">
-      <Select name="district" defaultValue={district ?? ""} aria-label="District">
-        <option value="">All districts</option>
-        {districts.map((item) => (
+    <div className="mb-4 flex flex-wrap gap-3">
+      <Select
+        value={court ?? ""}
+        onChange={(event) => updateFilter("district", event.target.value)}
+        aria-label="Federal court"
+      >
+        <option value="">All federal courts</option>
+        {courts.map((item) => (
           <option key={item} value={item}>
             {item}
           </option>
         ))}
       </Select>
 
-      <Select name="industry" defaultValue={industry ?? ""} aria-label="Industry">
+      <Select
+        value={industry ?? ""}
+        onChange={(event) => updateFilter("industry", event.target.value)}
+        aria-label="Industry"
+      >
         <option value="">All industries</option>
         {INDUSTRIES.map((item) => (
           <option key={item} value={item}>
@@ -30,15 +61,21 @@ export function Filters({ districts, district, industry, timeRange }: FiltersPro
         ))}
       </Select>
 
-      <Select name="timeRange" defaultValue={timeRange ?? ""} aria-label="Time range">
+      <Select
+        value={timeRange ?? ""}
+        onChange={(event) => updateFilter("timeRange", event.target.value)}
+        aria-label="Time range"
+      >
         <option value="">All time</option>
         <option value="7">Last 7 days</option>
         <option value="30">Last 30 days</option>
       </Select>
 
-      <Button type="submit">
-        Apply
-      </Button>
-    </form>
+      {hasFilters && (
+        <Button type="button" variant="outline" onClick={clearFilters}>
+          Clear filters
+        </Button>
+      )}
+    </div>
   );
 }

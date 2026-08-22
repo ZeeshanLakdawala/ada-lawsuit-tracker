@@ -5,6 +5,7 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3
 
 export type RawCaseListParams = {
   district?: string;
+  court?: string;
   industry?: string;
   timeRange?: string;
   page?: string;
@@ -19,7 +20,7 @@ export type CaseListParams = {
 
 export function parseCaseListParams(params: RawCaseListParams): CaseListParams {
   return {
-    district: cleanOptionalParam(params.district),
+    district: cleanOptionalParam(params.court ?? params.district),
     industry: parseIndustryParam(params.industry),
     timeRange: params.timeRange === "7" || params.timeRange === "30" ? params.timeRange : undefined,
     page: parsePageParam(params.page)

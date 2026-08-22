@@ -11,6 +11,7 @@ import { caseListPageHref, parseCaseListParams } from "@/lib/page-params";
 
 type SearchParams = Promise<{
   district?: string;
+  court?: string;
   industry?: string;
   timeRange?: string;
   page?: string;
@@ -19,7 +20,7 @@ type SearchParams = Promise<{
 export default async function Home({ searchParams }: { searchParams: SearchParams }) {
   const params = parseCaseListParams(await searchParams);
   const repository = getCasesRepository();
-  const [initialCasePage, metrics, plaintiffs, districts, industries, districtOptions] = await Promise.all([
+  const [initialCasePage, metrics, plaintiffs, districts, industries, courtOptions] = await Promise.all([
     repository.list({
       district: params.district,
       industry: params.industry,
@@ -77,30 +78,45 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
 
       <section className="rounded-lg border border-stone-300 bg-white p-5">
         <Filters
-          districts={districtOptions}
-          district={params.district}
+          courts={courtOptions}
+          court={params.district}
           industry={params.industry}
           timeRange={params.timeRange}
         />
         <CaseTable cases={casePage.cases} />
-        <nav className="mt-4 flex items-center justify-between gap-3" aria-label="Pagination">
-          <Link
-            className={buttonClasses("outline")}
-            href={caseListPageHref(currentPage - 1, params)}
-            aria-disabled={currentPage <= 1}
-          >
-            <ArrowLeft size={16} /> Previous
-          </Link>
-          <span className="text-sm text-stone-600">
-            Page {currentPage} of {totalPages}
-          </span>
-          <Link
-            className={buttonClasses("outline")}
-            href={caseListPageHref(currentPage + 1, params)}
-            aria-disabled={currentPage >= totalPages}
-          >
-            Next <ArrowRight size={16} />
-          </Link>
+        <nav className="mt-4 flex flex-wrap items-center justify-between gap-3" aria-label="Pagination">
+          {currentPage > 1 ? (
+            <Link className={buttonClasses("outline")} href={caseListPageHref(currentPage - 1, params)}>
+              <ArrowLeft size={16} /> Previous
+            </Link>
+          ) : (
+            <span className={buttonClasses("outline", "pointer-events-none opacity-50")} aria-disabled="true">
+              <ArrowLeft size={16} /> Previous
+            </span>
+          )}
+
+          <div className="flex flex-wrap items-center justify-center gap-1" aria-label="Page numbers">
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+              <Link
+                key={page}
+                className={buttonClasses(page === currentPage ? "default" : "outline", "h-9 min-w-9 px-2")}
+                href={caseListPageHref(page, params)}
+                aria-current={page === currentPage ? "page" : undefined}
+              >
+                {page}
+              </Link>
+            ))}
+          </div>
+
+          {currentPage < totalPages ? (
+            <Link className={buttonClasses("outline")} href={caseListPageHref(currentPage + 1, params)}>
+              Next <ArrowRight size={16} />
+            </Link>
+          ) : (
+            <span className={buttonClasses("outline", "pointer-events-none opacity-50")} aria-disabled="true">
+              Next <ArrowRight size={16} />
+            </span>
+          )}
         </nav>
       </section>
 
