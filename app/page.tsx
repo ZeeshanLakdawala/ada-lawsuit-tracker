@@ -45,24 +45,23 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
 
       <section className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm"><div className="overflow-x-auto p-2"><CaseTable cases={casePage.cases} /></div><PaginationScrubber currentPage={currentPage} totalPages={totalPages} district={params.district} industry={params.industry} timeRange={params.timeRange} /></section>
 
-      <section className="mt-16 rounded-2xl border border-stone-200 bg-white p-6">
-        <p className="mb-2 text-xs font-bold uppercase tracking-wide text-red-700">From our docket</p>
-        <h2 className="mb-2 text-2xl font-bold tracking-tight text-slate-950">Most active plaintiff names</h2>
-        <p className="mb-5 text-sm text-stone-500">Last names that appear most often across the federal filings currently in the database.</p>
-        <div className="max-w-2xl"><RankedBars rows={plaintiffs.slice(0, 8)} /></div>
-      </section>
-
-      <section className="mt-6 grid items-start gap-6 lg:grid-cols-2">
+      <section className="mt-16 grid items-start gap-6 lg:grid-cols-3">
+        <article className="rounded-2xl border border-stone-200 bg-white p-6">
+          <p className="mb-2 text-xs font-bold uppercase tracking-wide text-red-700">From our docket</p>
+          <h2 className="mb-2 text-2xl font-bold tracking-tight text-slate-950">Most active plaintiff names</h2>
+          <p className="mb-5 text-sm text-stone-500">Names that appear most often across the current filings.</p>
+          <RankedBars rows={plaintiffs.slice(0, 8)} />
+        </article>
         <article className="rounded-2xl border border-stone-200 bg-white p-6">
           <p className="mb-2 text-xs font-bold uppercase tracking-wide text-red-700">From our docket</p>
           <h2 className="mb-2 text-2xl font-bold tracking-tight text-slate-950">Most active federal districts</h2>
-          <p className="mb-5 text-sm text-stone-500">Districts with the highest number of filings in the current ingest.</p>
+          <p className="mb-5 text-sm text-stone-500">Federal courts with the highest number of filings.</p>
           <RankedBars rows={districts.slice(0, 8)} />
         </article>
         <article className="rounded-2xl border border-stone-200 bg-white p-6">
           <p className="mb-2 text-xs font-bold uppercase tracking-wide text-red-700">Industry exposure</p>
           <h2 className="mb-2 text-2xl font-bold tracking-tight text-slate-950">What gets sued, and who&apos;s been named</h2>
-          <p className="mb-5 text-sm text-stone-500">Pulled from our federal docket. Industries are inferred from defendant names.</p>
+          <p className="mb-5 text-sm text-stone-500">Pulled from the federal docket and grouped by industry.</p>
           <RankedBars rows={industries.slice(0, 8)} />
         </article>
       </section>
