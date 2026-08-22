@@ -31,10 +31,18 @@ Case: ${caseName}
 
 Return ONLY one category.`;
 
-  for (let attempt = 0; attempt < 2; attempt += 1) {
+  const models = Array.from(
+    new Set(
+      [process.env.GEMINI_MODEL, "gemini-1.5-flash", "gemini-flash-lite-latest", "gemini-flash-latest"].filter(
+        Boolean
+      )
+    )
+  );
+
+  for (const model of models) {
     try {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -42,7 +50,7 @@ Return ONLY one category.`;
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: {
               temperature: 0,
-              maxOutputTokens: 8
+              maxOutputTokens: 100
             }
           })
         }
@@ -58,9 +66,7 @@ Return ONLY one category.`;
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
       return parseIndustry(text);
     } catch (error) {
-      if (attempt === 1) {
-        return "Other";
-      }
+      continue;
     }
   }
 
