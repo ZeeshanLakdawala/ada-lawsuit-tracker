@@ -16,11 +16,13 @@ export async function ingestCases(
   repository: CasesRepository,
   classifier: Classifier = classifyIndustry
 ): Promise<IngestResult> {
-  if (!Array.isArray(payload) || payload.length === 0) {
+  const records = extractCaseRecords(payload);
+
+  if (records.length === 0) {
     throw new Error("Payload must be a non-empty array");
   }
 
-  const normalized = payload
+  const normalized = records
     .map((record) => normalizeRecord(record as RawCaseRecord))
     .filter((record) => record !== null);
 
@@ -41,6 +43,20 @@ export async function ingestCases(
   return {
     inserted: results.filter((result) => result === "inserted").length,
     skipped: results.filter((result) => result === "skipped").length,
-    rejected: payload.length - normalized.length
+    rejected: records.length - normalized.length
   };
+}
+
+export function extractCaseRecords(payload: unknown): unknown[] {
+  if (!Array.isArray(payload)) {
+    return [];
+  }
+
+  return payload.flatMap((item) => {
+    if (item && typeof item === "object" && "cases" in item && Array.isArray(item.cases)) {
+      return item.cases;
+    }
+
+    return item;
+  });
 }

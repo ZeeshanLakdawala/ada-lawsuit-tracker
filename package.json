@@ -10,6 +10,7 @@
     "test": "vitest run",
     "check:supabase": "node scripts/check-supabase.mjs",
     "brightdata:trigger": "node scripts/trigger-brightdata.mjs",
+    "brightdata:run-ingest": "node scripts/brightdata-run-ingest.mjs",
     "db:clear-cases": "node scripts/clear-cases.mjs"
   },
   "dependencies": {

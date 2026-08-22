@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ingestCases } from "@/lib/ingest";
+import { extractCaseRecords, ingestCases } from "@/lib/ingest";
 import { MemoryCasesRepository } from "./memory-repository";
 
 const validRecord = {
@@ -45,5 +45,17 @@ describe("ingestCases", () => {
     const result = await ingestCases([{ ...validRecord, case_number: "" }], repository);
 
     expect(result).toEqual({ inserted: 0, skipped: 0, rejected: 1 });
+  });
+
+  it("flattens Bright Data page results with cases arrays", async () => {
+    expect(extractCaseRecords([{ cases: [validRecord] }])).toEqual([validRecord]);
+  });
+
+  it("ingests Bright Data page results with nested cases arrays", async () => {
+    const repository = new MemoryCasesRepository();
+    const result = await ingestCases([{ cases: [validRecord] }], repository, async () => "Ecommerce");
+
+    expect(result).toEqual({ inserted: 1, skipped: 0, rejected: 0 });
+    expect(repository.records).toHaveLength(1);
   });
 });

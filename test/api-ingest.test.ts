@@ -57,6 +57,38 @@ describe("POST /api/ingest", () => {
     });
   });
 
+  it("accepts Bright Data nested cases arrays", async () => {
+    const repository = new MemoryCasesRepository();
+    const post = createIngestPost(repository, async () => "Ecommerce");
+    const response = await post(
+      new Request("http://localhost/api/ingest", {
+        method: "POST",
+        body: JSON.stringify([
+          {
+            cases: [
+              {
+                case_name: "Saenz v. R & D INVESTMENTS, LLC (S.D. Fla. 2026)",
+                docket_number: "1:26-cv-25447",
+                court: "S.D. Fla.",
+                date_filed: "August 12th, 2026",
+                plaintiff_name: "LLC",
+                defendant_name: "A&Y RESTAURANT",
+                case_url: "https://www.courtlistener.com/docket/74639645/saenz-v-r-d-investments-llc/"
+              }
+            ]
+          }
+        ])
+      })
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ inserted: 1, skipped: 0 });
+    expect(repository.records[0]).toMatchObject({
+      case_number: "1:26-cv-25447",
+      defendant: "A&Y RESTAURANT"
+    });
+  });
+
   it("repairs escaped underscores and raw newlines from pasted webhook tests", () => {
     const body =
       '[{"case\\_name":"Benavides\nMoran v. Ana Luisa Retail LLC (S.D.N.Y. 2026)","docket\\_number":"1:26-cv-07125"}]';

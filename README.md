@@ -92,6 +92,12 @@ pnpm brightdata:trigger -- --start=1 --pages=10
 
 The script sends 10 explicit input URLs to Bright Data. That is how the run knows where to stop.
 
+To trigger, poll Bright Data until results are ready, and then post the result into `/api/ingest`:
+
+```bash
+pnpm brightdata:run-ingest -- --start=1 --pages=10
+```
+
 To clear the `cases` table during test setup:
 
 ```bash
