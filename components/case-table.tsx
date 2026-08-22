@@ -16,6 +16,7 @@ export function CaseTable({ cases }: { cases: CaseRecord[] }) {
             <TableHead>Defendant</TableHead>
             <TableHead>Plaintiff</TableHead>
             <TableHead>District</TableHead>
+            <TableHead>Industry</TableHead>
             <TableHead>Case Number</TableHead>
           </TableRow>
         </TableHeader>
@@ -30,6 +31,7 @@ export function CaseTable({ cases }: { cases: CaseRecord[] }) {
             </TableCell>
             <TableCell>{caseRecord.plaintiff}</TableCell>
             <TableCell>{caseRecord.district}</TableCell>
+            <TableCell className="capitalize">{caseRecord.industry}</TableCell>
             <TableCell>{caseRecord.case_number}</TableCell>
           </TableRow>
         ))}

@@ -36,7 +36,17 @@ export class MemoryCasesRepository implements CasesRepository {
   }
 
   async metrics(): Promise<CaseMetrics> {
-    return { total: this.records.length, last7: this.records.length, last30: this.records.length };
+    return {
+      total: this.records.length,
+      filedYtd: this.records.length,
+      last7: this.records.length,
+      last30: this.records.length,
+      distinctDefendants: new Set(this.records.map((record) => record.defendant)).size,
+      distinctPlaintiffs: new Set(this.records.map((record) => record.plaintiff)).size,
+      activeDistricts: new Set(this.records.map((record) => record.district)).size,
+      largestSettlement: "$5.15M",
+      largestSettlementNote: "Fashion Nova, 2025 class action"
+    };
   }
 
   async topPlaintiffs() {

@@ -103,13 +103,28 @@ export class SupabaseCasesRepository implements CasesRepository {
   }
 
   async metrics() {
-    const [total, last7, last30] = await Promise.all([
+    const currentYear = new Date().getFullYear();
+    const [total, filedYtd, last7, last30, distinctDefendants, distinctPlaintiffs, activeDistricts] = await Promise.all([
       this.countSince(),
+      this.countSince(undefined, `${currentYear}-01-01`),
       this.countSince(7),
-      this.countSince(30)
+      this.countSince(30),
+      this.distinctCount("defendant"),
+      this.distinctCount("plaintiff"),
+      this.distinctCount("district")
     ]);
 
-    return { total, last7, last30 };
+    return {
+      total,
+      filedYtd,
+      last7,
+      last30,
+      distinctDefendants,
+      distinctPlaintiffs,
+      activeDistricts,
+      largestSettlement: "$5.15M",
+      largestSettlementNote: "Fashion Nova, 2025 class action"
+    };
   }
 
   async topPlaintiffs() {
@@ -151,10 +166,12 @@ export class SupabaseCasesRepository implements CasesRepository {
     return Array.from(new Set((data ?? []).map((row) => row.district).filter(Boolean)));
   }
 
-  private async countSince(days?: number) {
+  private async countSince(days?: number, fromDate?: string) {
     let query = this.client.from("cases").select("id", { count: "exact", head: true });
 
-    if (days) {
+    if (fromDate) {
+      query = query.gte("date_filed", fromDate);
+    } else if (days) {
       const date = new Date();
       date.setDate(date.getDate() - days);
       query = query.gte("date_filed", date.toISOString().slice(0, 10));
@@ -164,6 +181,18 @@ export class SupabaseCasesRepository implements CasesRepository {
 
     if (error) throw error;
     return count ?? 0;
+  }
+
+  private async distinctCount(column: "defendant" | "plaintiff" | "district") {
+    const { data, error } = await this.client.from("cases").select(column);
+
+    if (error) throw error;
+
+    return new Set(
+      (data ?? [])
+        .map((row) => (row as Record<string, unknown>)[column])
+        .filter((value): value is string => typeof value === "string" && value.trim().length > 0)
+    ).size;
   }
 
   private async countColumn(

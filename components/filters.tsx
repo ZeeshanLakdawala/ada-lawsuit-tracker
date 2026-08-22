@@ -6,21 +6,18 @@ import { Select } from "@/components/ui/select";
 import { INDUSTRIES } from "@/lib/types";
 
 type FiltersProps = {
-  courts: string[];
-  court?: string;
   industry?: string;
   timeRange?: string;
 };
 
-export function Filters({ courts, court, industry, timeRange }: FiltersProps) {
+export function Filters({ industry, timeRange }: FiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const hasFilters = Boolean(court || industry || timeRange);
+  const hasFilters = Boolean(industry || timeRange);
 
-  function updateFilter(name: "district" | "industry" | "timeRange", value: string) {
+  function updateFilter(name: "industry" | "timeRange", value: string) {
     const params = new URLSearchParams();
 
-    if (name !== "district" && court) params.set("district", court);
     if (name !== "industry" && industry) params.set("industry", industry);
     if (name !== "timeRange" && timeRange) params.set("timeRange", timeRange);
     if (value) params.set(name, value);
@@ -35,19 +32,6 @@ export function Filters({ courts, court, industry, timeRange }: FiltersProps) {
 
   return (
     <div className="mb-4 flex flex-wrap gap-3">
-      <Select
-        value={court ?? ""}
-        onChange={(event) => updateFilter("district", event.target.value)}
-        aria-label="Federal court"
-      >
-        <option value="">All federal courts</option>
-        {courts.map((item) => (
-          <option key={item} value={item}>
-            {item}
-          </option>
-        ))}
-      </Select>
-
       <Select
         value={industry ?? ""}
         onChange={(event) => updateFilter("industry", event.target.value)}

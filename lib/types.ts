@@ -49,8 +49,14 @@ export type CaseInsert = CaseRecordInput & {
 
 export type CaseMetrics = {
   total: number;
+  filedYtd: number;
   last7: number;
   last30: number;
+  distinctDefendants: number;
+  distinctPlaintiffs: number;
+  activeDistricts: number;
+  largestSettlement: string;
+  largestSettlementNote: string;
 };
 
 export type CountRow = {
