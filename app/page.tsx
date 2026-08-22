@@ -45,29 +45,29 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
 
       <section className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm"><div className="overflow-x-auto p-2"><CaseTable cases={casePage.cases} /></div><PaginationScrubber currentPage={currentPage} totalPages={totalPages} district={params.district} industry={params.industry} timeRange={params.timeRange} /></section>
 
-      <section className="mt-16 grid gap-6 lg:grid-cols-2">
-        <article className="rounded-2xl border border-stone-200 bg-white p-6">
-          <p className="mb-2 text-xs font-bold uppercase tracking-wide text-red-700">From our docket</p>
-          <h2 className="mb-2 text-2xl font-bold tracking-tight text-slate-950">Most active plaintiff names</h2>
-          <p className="mb-5 text-sm text-stone-500">Last names that appear most often across the federal filings currently in the database.</p>
-          <RankedBars rows={plaintiffs} />
-        </article>
+      <section className="mt-16 rounded-2xl border border-stone-200 bg-white p-6">
+        <p className="mb-2 text-xs font-bold uppercase tracking-wide text-red-700">From our docket</p>
+        <h2 className="mb-2 text-2xl font-bold tracking-tight text-slate-950">Most active plaintiff names</h2>
+        <p className="mb-5 text-sm text-stone-500">Last names that appear most often across the federal filings currently in the database.</p>
+        <div className="max-w-2xl"><RankedBars rows={plaintiffs.slice(0, 8)} /></div>
+      </section>
+
+      <section className="mt-6 grid items-start gap-6 lg:grid-cols-2">
         <article className="rounded-2xl border border-stone-200 bg-white p-6">
           <p className="mb-2 text-xs font-bold uppercase tracking-wide text-red-700">From our docket</p>
           <h2 className="mb-2 text-2xl font-bold tracking-tight text-slate-950">Most active federal districts</h2>
           <p className="mb-5 text-sm text-stone-500">Districts with the highest number of filings in the current ingest.</p>
-          <RankedBars rows={districts.slice(0, 10)} />
+          <RankedBars rows={districts.slice(0, 8)} />
+        </article>
+        <article className="rounded-2xl border border-stone-200 bg-white p-6">
+          <p className="mb-2 text-xs font-bold uppercase tracking-wide text-red-700">Industry exposure</p>
+          <h2 className="mb-2 text-2xl font-bold tracking-tight text-slate-950">What gets sued, and who&apos;s been named</h2>
+          <p className="mb-5 text-sm text-stone-500">Pulled from our federal docket. Industries are inferred from defendant names.</p>
+          <RankedBars rows={industries.slice(0, 8)} />
         </article>
       </section>
 
-      <section className="mt-16 rounded-2xl border border-stone-200 bg-white p-6">
-        <p className="mb-2 text-xs font-bold uppercase tracking-wide text-red-700">Industry exposure</p>
-        <h2 className="mb-2 text-2xl font-bold tracking-tight text-slate-950">What gets sued, and who&apos;s been named</h2>
-        <p className="mb-6 max-w-3xl text-sm text-stone-500">Pulled from our federal docket. Industries are inferred from defendant names, and the counts below show how cases are distributed across the current categories.</p>
-        <div className="grid gap-x-10 gap-y-4 md:grid-cols-2"><RankedBars rows={industries} /></div>
-      </section>
-
-      <section className="mt-16 grid gap-6 lg:grid-cols-[1.15fr_.85fr]">
+      <section className="mt-16">
         <article className="rounded-2xl border border-stone-200 bg-white p-6">
           <p className="mb-2 text-xs font-bold uppercase tracking-wide text-red-700">What it actually costs</p>
           <h2 className="mb-2 text-2xl font-bold tracking-tight text-slate-950">Settlement reality check</h2>
@@ -83,6 +83,9 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
           </div>
           <p className="mt-5 rounded-lg bg-stone-50 p-4 text-sm leading-6 text-stone-600"><strong className="text-stone-900">The widget paradox:</strong> 22.6% of 2025 lawsuits, 456 cases, targeted sites that already had an accessibility widget installed. The FTC reached a $1M settlement with accessiBe in 2025 over claims that its widget guaranteed compliance.</p>
         </article>
+      </section>
+
+      <section className="mt-6">
         <article className="rounded-2xl border border-stone-200 bg-slate-950 p-6 text-white">
           <p className="mb-2 text-xs font-bold uppercase tracking-wide text-red-300">Why this is happening</p>
           <h2 className="mb-4 text-2xl font-bold tracking-tight">Robles v. Domino&apos;s Pizza, LLC</h2>
