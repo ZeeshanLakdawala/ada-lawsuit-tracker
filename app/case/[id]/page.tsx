@@ -28,13 +28,13 @@ export default async function CaseDetail({ params }: PageProps) {
 
   return (
     <main className="mx-auto w-[min(920px,calc(100%-32px))] py-5 pb-10 max-[760px]:w-[min(100%-24px,100%)]">
-      <Link className="mb-5 inline-flex items-center gap-1.5 text-sm font-semibold text-stone-600 transition-colors hover:text-teal-700" href="/">
-        <ArrowLeft className="h-4 w-4" />
-        Back to federal filings
+      <Link className="mb-5 inline-flex items-center gap-1 text-xs font-medium text-stone-500 transition-colors hover:text-teal-700" href="/">
+        <ArrowLeft className="h-3.5 w-3.5" />
+        Back to live tracker
       </Link>
       <section className="border-b border-stone-200 pb-6">
         <div className="min-w-0">
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-red-700">
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.08em] text-red-700">
             Federal ADA website filing
           </p>
           <h1 className="max-w-[760px] text-[clamp(1.65rem,2.4vw,2.25rem)] font-semibold leading-[1.12] tracking-normal text-gray-950">
