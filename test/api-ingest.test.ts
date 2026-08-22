@@ -107,7 +107,8 @@ describe("POST /api/ingest", () => {
     });
     expect(repository.records[0]).toMatchObject({
       case_number: "1:26-cv-25447",
-      defendant: "A&Y RESTAURANT"
+      plaintiff: "Saenz",
+      defendant: "R & D INVESTMENTS, LLC"
     });
   });
 

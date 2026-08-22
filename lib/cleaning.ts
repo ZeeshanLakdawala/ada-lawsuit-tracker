@@ -13,9 +13,17 @@ export function cleanCaseName(name: string) {
 }
 
 export function extractPlaintiffFromCaseName(caseName: string): string {
+  return parsePartiesFromCaseName(caseName).plaintiff;
+}
+
+export function parsePartiesFromCaseName(caseName: string): { plaintiff: string; defendant: string } {
   const cleaned = cleanCaseName(cleanText(caseName));
-  const match = cleaned.match(/^(.+?)\s+v\.?\s+/iu);
-  return cleanText(match?.[1]);
+  const match = cleaned.match(/^(.+?)\s+v\.?\s+(.+)$/iu);
+
+  return {
+    plaintiff: cleanText(match?.[1]),
+    defendant: cleanText(match?.[2])
+  };
 }
 
 export function cleanUrl(value: unknown): string {
@@ -85,11 +93,12 @@ export function normalizeRecord(raw: RawCaseRecord): CaseRecordInput | null {
   const dateFiled = normalizeDate(raw.date_filed);
   const caseName = cleanCaseName(cleanText(raw.case_name));
   const rawPlaintiff = cleanText(raw.plaintiff ?? raw.plaintiff_name);
-  const parsedPlaintiff = extractPlaintiffFromCaseName(caseName);
+  const rawDefendant = cleanText(raw.defendant ?? raw.defendant_name);
+  const parsedParties = parsePartiesFromCaseName(caseName);
   const record = {
     case_name: caseName,
-    defendant: cleanText(raw.defendant ?? raw.defendant_name),
-    plaintiff: isPartyNameFragment(rawPlaintiff) && parsedPlaintiff ? parsedPlaintiff : rawPlaintiff,
+    defendant: choosePartyName(rawDefendant, parsedParties.defendant),
+    plaintiff: choosePartyName(rawPlaintiff, parsedParties.plaintiff),
     district: cleanText(raw.district ?? raw.court),
     date_filed: dateFiled ?? "",
     case_number: cleanText(raw.case_number ?? raw.docket_number),
@@ -109,4 +118,31 @@ export function normalizeRecord(raw: RawCaseRecord): CaseRecordInput | null {
 
 function isPartyNameFragment(value: string) {
   return ["inc", "llc", "ltd", "corp", "co", "company"].includes(value.toLowerCase().replace(/\./g, ""));
+}
+
+function choosePartyName(rawValue: string, parsedValue: string) {
+  if (!parsedValue) {
+    return rawValue;
+  }
+
+  if (!rawValue || isPartyNameFragment(rawValue)) {
+    return parsedValue;
+  }
+
+  const raw = normalizePartyForComparison(rawValue);
+  const parsed = normalizePartyForComparison(parsedValue);
+
+  if (raw.includes(parsed) || parsed.includes(raw)) {
+    return rawValue;
+  }
+
+  return parsedValue;
+}
+
+function normalizePartyForComparison(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/\b(incorporated|inc|llc|l\.l\.c|ltd|corp|corporation|company|co)\b/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 }
