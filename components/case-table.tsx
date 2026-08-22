@@ -1,37 +1,40 @@
 import Link from "next/link";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { CaseRecord } from "@/lib/types";
 
 export function CaseTable({ cases }: { cases: CaseRecord[] }) {
   if (cases.length === 0) {
-    return <p className="empty">No filings match these filters.</p>;
+    return <p className="py-7 text-center text-sm text-stone-500">No filings match these filters.</p>;
   }
 
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>Date Filed</th>
-          <th>Defendant</th>
-          <th>Plaintiff</th>
-          <th>District</th>
-          <th>Case #</th>
-        </tr>
-      </thead>
-      <tbody>
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Date Filed</TableHead>
+            <TableHead>Defendant</TableHead>
+            <TableHead>Plaintiff</TableHead>
+            <TableHead>District</TableHead>
+            <TableHead>Case Number</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
         {cases.map((caseRecord) => (
-          <tr key={caseRecord.id}>
-            <td>{caseRecord.date_filed}</td>
-            <td>
-              <Link className="link" href={`/case/${caseRecord.id}`}>
+          <TableRow key={caseRecord.id}>
+            <TableCell>{caseRecord.date_filed}</TableCell>
+            <TableCell>
+              <Link className="font-semibold text-teal-800" href={`/case/${caseRecord.id}`}>
                 {caseRecord.defendant}
               </Link>
-            </td>
-            <td>{caseRecord.plaintiff}</td>
-            <td>{caseRecord.district}</td>
-            <td>{caseRecord.case_number}</td>
-          </tr>
+            </TableCell>
+            <TableCell>{caseRecord.plaintiff}</TableCell>
+            <TableCell>{caseRecord.district}</TableCell>
+            <TableCell>{caseRecord.case_number}</TableCell>
+          </TableRow>
         ))}
-      </tbody>
-    </table>
+        </TableBody>
+      </Table>
+    </div>
   );
 }

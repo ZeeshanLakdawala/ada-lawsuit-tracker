@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { notFound } from "next/navigation";
+import { buttonClasses } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCasesRepository } from "@/lib/cases-repository";
 
 type PageProps = {
@@ -19,69 +21,81 @@ export default async function CaseDetail({ params }: PageProps) {
   const related = await repository.relatedCases(caseRecord.district, caseRecord.id);
 
   return (
-    <main className="page">
-      <section className="case-header">
+    <main className="mx-auto w-[min(1180px,calc(100%-32px))] py-8 pb-14">
+      <section className="flex items-start justify-between gap-4 max-[820px]:block">
         <div>
-          <p className="eyebrow">Case detail</p>
-          <h1>{caseRecord.case_name}</h1>
-          <p className="subhead">
-            {caseRecord.date_filed} · {caseRecord.district} · {caseRecord.case_number}
+          <p className="mb-2 text-xs font-bold uppercase tracking-normal text-teal-800">Case detail</p>
+          <h1 className="mb-2 text-4xl font-bold tracking-normal text-stone-900 sm:text-5xl">
+            {caseRecord.case_name}
+          </h1>
+          <p className="max-w-2xl text-stone-500">
+            {caseRecord.date_filed} | {caseRecord.district} | {caseRecord.case_number}
           </p>
         </div>
-        <a className="button primary" href={caseRecord.case_url} target="_blank" rel="noreferrer">
+        <a className={buttonClasses("default", "mt-2 max-[820px]:mt-5")} href={caseRecord.case_url} target="_blank" rel="noreferrer">
           Open filing <ExternalLink size={16} />
         </a>
       </section>
 
-      <section className="detail-grid">
-        <div className="case-card">
-          <h2>Parties</h2>
-          <div className="fact">
-            <span className="label">Defendant</span>
-            <strong>{caseRecord.defendant}</strong>
-          </div>
-          <br />
-          <div className="fact">
-            <span className="label">Plaintiff</span>
-            <strong>{caseRecord.plaintiff}</strong>
-          </div>
-        </div>
+      <section className="mt-7 grid grid-cols-3 gap-4 max-[820px]:grid-cols-1">
+        <Card>
+          <CardHeader>
+            <CardTitle>Parties</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-5">
+            <div className="grid gap-1">
+              <span className="text-sm text-stone-500">Defendant</span>
+              <strong>{caseRecord.defendant}</strong>
+            </div>
+            <div className="grid gap-1">
+              <span className="text-sm text-stone-500">Plaintiff</span>
+              <strong>{caseRecord.plaintiff}</strong>
+            </div>
+          </CardContent>
+        </Card>
 
-        <div className="case-card">
-          <h2>Filing facts</h2>
-          <ul className="list">
-            <li>
+        <Card>
+          <CardHeader>
+            <CardTitle>Filing facts</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="grid gap-2">
+              <li className="flex justify-between gap-3 border-b border-stone-300 pb-2 text-sm">
               <span>District</span>
               <strong>{caseRecord.district}</strong>
             </li>
-            <li>
+              <li className="flex justify-between gap-3 border-b border-stone-300 pb-2 text-sm">
               <span>Case number</span>
               <strong>{caseRecord.case_number}</strong>
             </li>
-            <li>
+              <li className="flex justify-between gap-3 border-b border-stone-300 pb-2 text-sm">
               <span>Date filed</span>
               <strong>{caseRecord.date_filed}</strong>
             </li>
-            <li>
+              <li className="flex justify-between gap-3 border-b border-stone-300 pb-2 text-sm">
               <span>Industry</span>
               <strong>{caseRecord.industry}</strong>
             </li>
-            <li>
+              <li className="flex justify-between gap-3 border-b border-stone-300 pb-2 text-sm">
               <span>Category</span>
               <strong>ADA website</strong>
             </li>
-          </ul>
-        </div>
+            </ul>
+          </CardContent>
+        </Card>
 
-        <div className="case-card">
-          <h2>Related cases</h2>
+        <Card>
+          <CardHeader>
+            <CardTitle>Related cases</CardTitle>
+          </CardHeader>
+          <CardContent>
           {related.length === 0 ? (
-            <p className="empty">No related cases in this district yet.</p>
+            <p className="py-7 text-center text-sm text-stone-500">No related cases in this district yet.</p>
           ) : (
-            <ul className="list">
+            <ul className="grid gap-2">
               {related.map((item) => (
-                <li key={item.id}>
-                  <Link className="link" href={`/case/${item.id}`}>
+                <li key={item.id} className="flex justify-between gap-3 border-b border-stone-300 pb-2 text-sm">
+                  <Link className="font-semibold text-teal-800" href={`/case/${item.id}`}>
                     {item.defendant}
                   </Link>
                   <span>{item.date_filed}</span>
@@ -89,7 +103,8 @@ export default async function CaseDetail({ params }: PageProps) {
               ))}
             </ul>
           )}
-        </div>
+          </CardContent>
+        </Card>
       </section>
     </main>
   );

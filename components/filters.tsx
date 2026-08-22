@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 import { INDUSTRIES } from "@/lib/types";
 
 type FiltersProps = {
@@ -9,34 +11,34 @@ type FiltersProps = {
 
 export function Filters({ districts, district, industry, timeRange }: FiltersProps) {
   return (
-    <form className="filters">
-      <select name="district" defaultValue={district ?? ""} aria-label="District">
+    <form className="mb-4 flex flex-wrap gap-3">
+      <Select name="district" defaultValue={district ?? ""} aria-label="District">
         <option value="">All districts</option>
         {districts.map((item) => (
           <option key={item} value={item}>
             {item}
           </option>
         ))}
-      </select>
+      </Select>
 
-      <select name="industry" defaultValue={industry ?? ""} aria-label="Industry">
+      <Select name="industry" defaultValue={industry ?? ""} aria-label="Industry">
         <option value="">All industries</option>
         {INDUSTRIES.map((item) => (
           <option key={item} value={item}>
             {item}
           </option>
         ))}
-      </select>
+      </Select>
 
-      <select name="timeRange" defaultValue={timeRange ?? ""} aria-label="Time range">
+      <Select name="timeRange" defaultValue={timeRange ?? ""} aria-label="Time range">
         <option value="">All time</option>
         <option value="7">Last 7 days</option>
         <option value="30">Last 30 days</option>
-      </select>
+      </Select>
 
-      <button className="button primary" type="submit">
+      <Button type="submit">
         Apply
-      </button>
+      </Button>
     </form>
   );
 }
