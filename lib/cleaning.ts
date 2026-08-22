@@ -22,8 +22,12 @@ export function parsePartiesFromCaseName(caseName: string): { plaintiff: string;
 
   return {
     plaintiff: cleanText(match?.[1]),
-    defendant: cleanText(match?.[2])
+    defendant: cleanPartyName(match?.[2])
   };
+}
+
+export function cleanPartyName(value: unknown): string {
+  return cleanText(cleanText(value).replace(/,\s+(a|an|the)\s+.+$/iu, ""));
 }
 
 export function cleanUrl(value: unknown): string {
@@ -93,7 +97,7 @@ export function normalizeRecord(raw: RawCaseRecord): CaseRecordInput | null {
   const dateFiled = normalizeDate(raw.date_filed);
   const caseName = cleanCaseName(cleanText(raw.case_name));
   const rawPlaintiff = cleanText(raw.plaintiff ?? raw.plaintiff_name);
-  const rawDefendant = cleanText(raw.defendant ?? raw.defendant_name);
+  const rawDefendant = cleanPartyName(raw.defendant ?? raw.defendant_name);
   const parsedParties = parsePartiesFromCaseName(caseName);
   const record = {
     case_name: caseName,
@@ -133,10 +137,14 @@ function choosePartyName(rawValue: string, parsedValue: string) {
   const parsed = normalizePartyForComparison(parsedValue);
 
   if (raw.includes(parsed) || parsed.includes(raw)) {
-    return rawValue;
+    return partyHasLegalSuffix(parsedValue) && !partyHasLegalSuffix(rawValue) ? parsedValue : rawValue;
   }
 
   return parsedValue;
+}
+
+function partyHasLegalSuffix(value: string) {
+  return /\b(inc|llc|l\.l\.c|ltd|corp|corporation|lp|l\.p|limited partnership)\b\.?$/iu.test(value.trim());
 }
 
 function normalizePartyForComparison(value: string) {

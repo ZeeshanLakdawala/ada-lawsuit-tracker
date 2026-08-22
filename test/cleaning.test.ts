@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   cleanCaseName,
+  cleanPartyName,
   cleanText,
   cleanUrl,
   extractPlaintiffFromCaseName,
@@ -16,6 +17,15 @@ describe("cleaning", () => {
 
   it("trims text and trailing punctuation", () => {
     expect(cleanText("  ABC Inc. ")).toBe("ABC Inc");
+  });
+
+  it("removes jurisdiction descriptions from party names", () => {
+    expect(
+      cleanPartyName(
+        "Partners Preferred Yield II, Ltd., a California Limited Partnership, Colorado Authority Relinquished December 15, 2005"
+      )
+    ).toBe("Partners Preferred Yield II, Ltd");
+    expect(cleanPartyName("PCH Lube Center, A California Limited Partnership")).toBe("PCH Lube Center");
   });
 
   it("rejects missing case number", () => {
@@ -84,7 +94,8 @@ describe("cleaning", () => {
       })
     ).toMatchObject({
       case_name: "Benavides Moran v. Scandinavian Designs, Inc.",
-      plaintiff: "Benavides Moran"
+      plaintiff: "Benavides Moran",
+      defendant: "Scandinavian Designs, Inc"
     });
   });
 
@@ -131,6 +142,33 @@ describe("cleaning", () => {
     expect(parsePartiesFromCaseName("Pagan v. Dolce & Gabbana USA Inc. (S.D. Fla. 2026)")).toEqual({
       plaintiff: "Pagan",
       defendant: "Dolce & Gabbana USA Inc"
+    });
+  });
+
+  it("keeps descriptive plaintiff captions intact", () => {
+    expect(
+      parsePartiesFromCaseName(
+        "A.A., a minor, by and through his Next Friend, B.B. v. Mobile County Public School System"
+      )
+    ).toEqual({
+      plaintiff: "A.A., a minor, by and through his Next Friend, B.B",
+      defendant: "Mobile County Public School System"
+    });
+  });
+
+  it("keeps legal suffixes from case names when Bright Data truncates defendants", () => {
+    expect(
+      normalizeRecord({
+        case_name: "Benavides Moran v. J & J Group, LLC (S.D.N.Y. 2026)",
+        defendant_name: "J & J Group",
+        plaintiff_name: "Benavides Moran",
+        court: "S.D.N.Y.",
+        date_filed: "August 14th, 2026",
+        docket_number: "1:26-cv-06946",
+        case_url: "https://example.com/case"
+      })
+    ).toMatchObject({
+      defendant: "J & J Group, LLC"
     });
   });
 
