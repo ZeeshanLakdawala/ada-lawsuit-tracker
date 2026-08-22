@@ -21,7 +21,7 @@ create table if not exists cases (
       'Other'
     )
   ),
-  created_at timestamptz not null default now()
+  created_at timestamp default now()
 );
 
 create index if not exists cases_date_filed_idx on cases (date_filed desc);
