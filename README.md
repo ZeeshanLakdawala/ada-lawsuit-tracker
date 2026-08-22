@@ -103,3 +103,9 @@ To clear the `cases` table during test setup:
 ```bash
 pnpm db:clear-cases -- --confirm
 ```
+
+To re-run industry classification for rows currently marked `Other`:
+
+```bash
+pnpm db:reclassify-cases -- --limit=100
+```
