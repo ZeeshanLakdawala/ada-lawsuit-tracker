@@ -1,4 +1,6 @@
 import {
+  DEFAULT_BRIGHTDATA_PAGES,
+  DEFAULT_BRIGHTDATA_START_PAGE,
   buildCourtListenerInputs,
   countCases,
   getBrightDataConfig,
@@ -16,14 +18,14 @@ const args = Object.fromEntries(
 
 const env = readEnvFile();
 const { apiToken, collectorId } = getBrightDataConfig();
-const startPage = Number(args.start ?? 1);
-const pages = Number(args.pages ?? 10);
+const startPage = Number(args.start ?? DEFAULT_BRIGHTDATA_START_PAGE);
+const pages = Number(args.pages ?? DEFAULT_BRIGHTDATA_PAGES);
 const ingestUrl = args.ingestUrl ?? env.INGEST_URL ?? "https://ada-lawsuit-tracker.vercel.app/api/ingest";
 const timeoutMs = Number(args.timeoutMs ?? 10 * 60 * 1000);
 const intervalMs = Number(args.intervalMs ?? 10 * 1000);
 
 if (!Number.isInteger(startPage) || startPage < 1 || !Number.isInteger(pages) || pages < 1) {
-  console.error("Usage: pnpm brightdata:run-ingest -- --start=1 --pages=10");
+  console.error(`Usage: pnpm brightdata:run-ingest -- --start=1 --pages=${DEFAULT_BRIGHTDATA_PAGES}`);
   process.exit(1);
 }
 

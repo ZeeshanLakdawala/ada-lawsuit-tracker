@@ -1,4 +1,10 @@
-import { buildCourtListenerInputs, getBrightDataConfig, triggerBrightData } from "./brightdata-client.mjs";
+import {
+  DEFAULT_BRIGHTDATA_PAGES,
+  DEFAULT_BRIGHTDATA_START_PAGE,
+  buildCourtListenerInputs,
+  getBrightDataConfig,
+  triggerBrightData
+} from "./brightdata-client.mjs";
 
 const { apiToken, collectorId } = getBrightDataConfig();
 
@@ -9,11 +15,11 @@ const args = Object.fromEntries(
   })
 );
 
-const startPage = Number(args.start ?? 1);
-const pages = Number(args.pages ?? 10);
+const startPage = Number(args.start ?? DEFAULT_BRIGHTDATA_START_PAGE);
+const pages = Number(args.pages ?? DEFAULT_BRIGHTDATA_PAGES);
 
 if (!Number.isInteger(startPage) || startPage < 1 || !Number.isInteger(pages) || pages < 1) {
-  console.error("Usage: pnpm brightdata:trigger -- --start=1 --pages=10");
+  console.error(`Usage: pnpm brightdata:trigger -- --start=1 --pages=${DEFAULT_BRIGHTDATA_PAGES}`);
   process.exit(1);
 }
 
