@@ -1,12 +1,10 @@
-import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import { CaseTable } from "@/components/case-table";
 import { Filters } from "@/components/filters";
+import { PaginationScrubber } from "@/components/pagination-scrubber";
 import { RankedBars } from "@/components/ranked-bars";
-import { buttonClasses } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getCasesRepository } from "@/lib/cases-repository";
-import { caseListPageHref, parseCaseListParams } from "@/lib/page-params";
+import { parseCaseListParams } from "@/lib/page-params";
 
 type SearchParams = Promise<{ district?: string; court?: string; industry?: string; timeRange?: string; page?: string }>;
 
@@ -45,11 +43,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
       <section className="mb-5"><p className="mb-2 text-xs font-bold uppercase tracking-wide text-red-700">{metrics.total} filings in our docket</p><h2 className="mb-2 text-3xl font-bold tracking-tight text-slate-950">Federal ADA website filings</h2><p className="max-w-4xl text-stone-500">Live cases from CourtListener&apos;s RECAP archive, {metrics.total} in our DB so far, against a known 2025 total of 3,948 nationally. Use the filters below to narrow by industry or filing window. Click any case to view the docket.</p></section>
       <section className="mb-4 rounded-xl border border-stone-200 bg-stone-50 p-4" aria-label="Filing filters"><Filters industry={params.industry} timeRange={params.timeRange} /></section>
 
-      <section className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm"><div className="overflow-x-auto p-2"><CaseTable cases={casePage.cases} /></div><nav className="flex flex-wrap items-center justify-between gap-3 border-t border-stone-200 px-4 py-4" aria-label="Pagination">
-        {currentPage > 1 ? <Link className={buttonClasses("outline")} href={caseListPageHref(currentPage - 1, params)}><ArrowLeft size={16} /> Previous</Link> : <span className={buttonClasses("outline", "pointer-events-none opacity-50")} aria-disabled="true"><ArrowLeft size={16} /> Previous</span>}
-        <div className="flex flex-wrap items-center justify-center gap-1" aria-label="Page numbers">{Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => <Link key={page} className={buttonClasses(page === currentPage ? "default" : "outline", "h-9 min-w-9 px-2")} href={caseListPageHref(page, params)} aria-current={page === currentPage ? "page" : undefined}>{page}</Link>)}</div>
-        {currentPage < totalPages ? <Link className={buttonClasses("outline")} href={caseListPageHref(currentPage + 1, params)}>Next <ArrowRight size={16} /></Link> : <span className={buttonClasses("outline", "pointer-events-none opacity-50")} aria-disabled="true">Next <ArrowRight size={16} /></span>}
-      </nav></section>
+      <section className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm"><div className="overflow-x-auto p-2"><CaseTable cases={casePage.cases} /></div><PaginationScrubber currentPage={currentPage} totalPages={totalPages} district={params.district} industry={params.industry} timeRange={params.timeRange} /></section>
 
       <section className="mt-16 grid gap-6 lg:grid-cols-2">
         <article className="rounded-2xl border border-stone-200 bg-white p-6">
