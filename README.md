@@ -76,3 +76,24 @@ case_url
 ```
 
 The endpoint handles the batch record by record. Duplicates are skipped by `case_number`; invalid rows are counted as rejected.
+
+To trigger CourtListener pages 1-10 through the Bright Data collector, add these to `.env.local`:
+
+```bash
+BRIGHTDATA_API_TOKEN=...
+BRIGHTDATA_COLLECTOR_ID=c_mt1pq36661zec4ol4
+```
+
+Then run:
+
+```bash
+pnpm brightdata:trigger -- --start=1 --pages=10
+```
+
+The script sends 10 explicit input URLs to Bright Data. That is how the run knows where to stop.
+
+To clear the `cases` table during test setup:
+
+```bash
+pnpm db:clear-cases -- --confirm
+```

@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
-    "check:supabase": "node scripts/check-supabase.mjs"
+    "check:supabase": "node scripts/check-supabase.mjs",
+    "brightdata:trigger": "node scripts/trigger-brightdata.mjs",
+    "db:clear-cases": "node scripts/clear-cases.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
