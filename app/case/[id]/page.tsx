@@ -58,7 +58,7 @@ export default async function CaseDetail({ params }: PageProps) {
             <CardHeader className="p-4 pb-1">
               <CardTitle className="text-sm font-semibold uppercase tracking-[0.04em] text-stone-600">Parties</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-[minmax(0,1.2fr)_minmax(160px,0.8fr)] gap-x-3 gap-y-3 p-4 pt-3 max-[640px]:grid-cols-1">
+            <CardContent className="grid grid-cols-[minmax(0,1.2fr)_minmax(160px,0.8fr)] gap-x-2 gap-y-3 p-4 pt-3 max-[640px]:grid-cols-1">
               <PartyFact label="Defendant" value={caseRecord.defendant} />
               <PartyFact label="Plaintiff" value={caseRecord.plaintiff} />
             </CardContent>
@@ -70,7 +70,7 @@ export default async function CaseDetail({ params }: PageProps) {
                 Filing facts
               </CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-[minmax(0,1fr)_minmax(160px,0.9fr)] gap-x-3 gap-y-3 p-4 pt-3 max-[640px]:grid-cols-1">
+            <CardContent className="grid grid-cols-[minmax(0,1fr)_minmax(160px,0.9fr)] gap-x-2 gap-y-3 p-4 pt-3 max-[640px]:grid-cols-1">
               <DetailFact label="Court" value={caseRecord.district} />
               <DetailFact label="Date filed" value={caseRecord.date_filed} />
               <DetailFact label="Case number" value={caseRecord.case_number} mono />
@@ -82,6 +82,13 @@ export default async function CaseDetail({ params }: PageProps) {
         </div>
 
         <RelatedCasesCard district={caseRecord.district} related={related} />
+      </section>
+
+      <section className="mt-3 rounded-xl border border-stone-200 bg-stone-100 px-5 py-4">
+        <h2 className="text-sm font-semibold uppercase tracking-[0.04em] text-stone-600">Why this case appears here</h2>
+        <p className="mt-3 max-w-4xl text-sm leading-6 text-stone-600">
+          This is a real federal court filing pulled from CourtListener&apos;s public RECAP archive. It was identified as an ADA website accessibility case based on its Nature of Suit code (446, 443, or 440) and the case caption. We don&apos;t add commentary on the merits. The filing speaks for itself.
+        </p>
       </section>
     </main>
   );
@@ -129,7 +136,7 @@ function RelatedCasesCard({ district, related }: { district: string; related: Ca
         ) : (
           <ul>
             {related.slice(0, 5).map((item) => (
-            <li key={item.id} className="border-b border-stone-200 py-2.5 first:pt-0 last:border-b-0 last:pb-0">
+              <li key={item.id} className="border-b border-stone-200 py-2.5 first:pt-0 last:border-b-0 last:pb-0">
                 <Link className="text-sm font-medium leading-snug text-blue-950" href={`/case/${item.id}`}>
                   {item.defendant}
                 </Link>
