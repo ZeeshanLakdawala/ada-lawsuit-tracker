@@ -12,7 +12,7 @@ export function createIngestPost(repository: CasesRepository, classifier?: Class
       return NextResponse.json(
         {
           error:
-            "Invalid JSON. Send a raw JSON array, not a markdown-formatted sample. Remove escaped underscores and unescaped line breaks inside string values."
+            "Invalid JSON. Send Bright Data's raw JSON output, not a markdown-formatted sample. Remove escaped underscores and unescaped line breaks inside string values."
         },
         { status: 400 }
       );

@@ -93,6 +93,6 @@ export function countCases(dataset) {
       return count + item.cases.length;
     }
 
-    return count + 1;
+    return count;
   }, 0);
 }

@@ -28,18 +28,22 @@ pnpm dev
 
 ## Ingest webhook
 
-POST `/api/ingest` with an array:
+POST `/api/ingest` with Bright Data's page-level result array:
 
 ```json
 [
   {
-    "case_name": "Jane Doe v Example Retail Inc. (2026)",
-    "defendant": "Example Retail Inc.",
-    "plaintiff": "Jane Doe",
-    "district": "S.D.N.Y.",
-    "date_filed": "2026-08-20",
-    "case_number": "1:26-cv-12345",
-    "case_url": "https://example.com/case"
+    "cases": [
+      {
+        "case_name": "Jane Doe v Example Retail Inc. (2026)",
+        "defendant_name": "Example Retail Inc.",
+        "plaintiff_name": "Jane Doe",
+        "court": "S.D.N.Y.",
+        "date_filed": "August 20th, 2026",
+        "docket_number": "1:26-cv-12345",
+        "case_url": "https://example.com/case"
+      }
+    ]
   }
 ]
 ```
@@ -63,15 +67,15 @@ Set the Bright Data subscription webhook URL to:
 https://YOUR-VERCEL-DOMAIN/api/ingest
 ```
 
-Send the scraper output as a JSON array. Each item must include:
+Send Bright Data's raw JSON output. Each page item must include a `cases` array. Each case must include:
 
 ```text
 case_name
-defendant
-plaintiff
-district
+defendant_name
+plaintiff_name
+court
 date_filed
-case_number
+docket_number
 case_url
 ```
 
@@ -108,4 +112,10 @@ To re-run industry classification for rows currently marked `Other`:
 
 ```bash
 pnpm db:reclassify-cases -- --limit=100
+```
+
+To re-run all rows while staying under the Gemini Flash Lite 15 RPM limit:
+
+```bash
+pnpm db:reclassify-cases -- --all --limit=100 --delay-ms=4200
 ```

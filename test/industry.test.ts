@@ -10,7 +10,7 @@ afterEach(() => {
 
 describe("industry", () => {
   it("accepts a valid category", () => {
-    expect(parseIndustry("Finance")).toBe("Finance");
+    expect(parseIndustry("Financial")).toBe("Financial");
   });
 
   it("falls back when AI returns a sentence", () => {
@@ -21,7 +21,7 @@ describe("industry", () => {
     expect(parseIndustry("")).toBe("Other");
   });
 
-  it("tries the current Flash alias when the PRD model is unavailable", async () => {
+  it("tries Flash Lite fallback when the requested model is unavailable", async () => {
     process.env.GEMINI_API_KEY = "test-key";
     const fetchMock = vi
       .spyOn(globalThis, "fetch")
@@ -39,7 +39,22 @@ describe("industry", () => {
       "Ecommerce"
     );
     expect(fetchMock).toHaveBeenCalledTimes(2);
-    expect(fetchMock.mock.calls[0][0]).toContain("gemini-1.5-flash");
+    expect(fetchMock.mock.calls[0][0]).toContain("gemini-3.5-flash-lite");
     expect(fetchMock.mock.calls[1][0]).toContain("gemini-flash-lite-latest");
+  });
+
+  it("lets Gemini classify person names as Other", async () => {
+    process.env.GEMINI_API_KEY = "test-key";
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          candidates: [{ content: { parts: [{ text: "Other" }] } }]
+        }),
+        { status: 200 }
+      )
+    );
+
+    await expect(classifyIndustry("Carlos Brito", "Brito v. FRYD DEVELOPERS LTD.")).resolves.toBe("Other");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });

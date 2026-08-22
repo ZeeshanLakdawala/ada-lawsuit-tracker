@@ -11,13 +11,15 @@ create table if not exists cases (
   case_url text not null,
   industry text not null check (
     industry in (
+      'Retail',
+      'Real Estate',
       'Ecommerce',
-      'SaaS',
       'Healthcare',
-      'Finance',
       'Education',
       'Hospitality',
-      'Government',
+      'Financial',
+      'Technology',
+      'Travel',
       'Other'
     )
   ),

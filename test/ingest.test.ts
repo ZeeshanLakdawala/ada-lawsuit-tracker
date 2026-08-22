@@ -15,7 +15,7 @@ const validRecord = {
 describe("ingestCases", () => {
   it("inserts a valid record with classified industry", async () => {
     const repository = new MemoryCasesRepository();
-    const result = await ingestCases([validRecord], repository, async () => "Ecommerce");
+    const result = await ingestCases([{ cases: [validRecord] }], repository, async () => "Ecommerce");
 
     expect(result).toEqual({ inserted: 1, skipped: 0, rejected: 0 });
     expect(repository.records[0]).toMatchObject({
@@ -27,8 +27,8 @@ describe("ingestCases", () => {
   it("skips duplicate case numbers", async () => {
     const repository = new MemoryCasesRepository();
 
-    await ingestCases([validRecord], repository, async () => "Ecommerce");
-    const result = await ingestCases([validRecord], repository, async () => "Ecommerce");
+    await ingestCases([{ cases: [validRecord] }], repository, async () => "Ecommerce");
+    const result = await ingestCases([{ cases: [validRecord] }], repository, async () => "Ecommerce");
 
     expect(result).toEqual({ inserted: 0, skipped: 1, rejected: 0 });
     expect(repository.records).toHaveLength(1);
@@ -37,18 +37,22 @@ describe("ingestCases", () => {
   it("rejects empty payload", async () => {
     const repository = new MemoryCasesRepository();
 
-    await expect(ingestCases([], repository)).rejects.toThrow("Payload must be a non-empty array");
+    await expect(ingestCases([], repository)).rejects.toThrow("Payload must include Bright Data page objects");
   });
 
   it("counts invalid records as rejected", async () => {
     const repository = new MemoryCasesRepository();
-    const result = await ingestCases([{ ...validRecord, case_number: "" }], repository);
+    const result = await ingestCases([{ cases: [{ ...validRecord, case_number: "" }] }], repository);
 
     expect(result).toEqual({ inserted: 0, skipped: 0, rejected: 1 });
   });
 
-  it("flattens Bright Data page results with cases arrays", async () => {
+  it("extracts Bright Data page results with cases arrays", async () => {
     expect(extractCaseRecords([{ cases: [validRecord] }])).toEqual([validRecord]);
+  });
+
+  it("ignores payload items without cases arrays", async () => {
+    expect(extractCaseRecords([validRecord])).toEqual([]);
   });
 
   it("ingests Bright Data page results with nested cases arrays", async () => {

@@ -19,7 +19,7 @@ export async function ingestCases(
   const records = extractCaseRecords(payload);
 
   if (records.length === 0) {
-    throw new Error("Payload must be a non-empty array");
+    throw new Error("Payload must include Bright Data page objects with non-empty cases arrays");
   }
 
   const normalized = records
@@ -52,11 +52,7 @@ export function extractCaseRecords(payload: unknown): unknown[] {
     return [];
   }
 
-  return payload.flatMap((item) => {
-    if (item && typeof item === "object" && "cases" in item && Array.isArray(item.cases)) {
-      return item.cases;
-    }
-
-    return item;
-  });
+  return payload.flatMap((item) =>
+    item && typeof item === "object" && "cases" in item && Array.isArray(item.cases) ? item.cases : []
+  );
 }

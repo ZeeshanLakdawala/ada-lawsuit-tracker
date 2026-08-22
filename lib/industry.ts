@@ -1,6 +1,7 @@
 import { INDUSTRIES, type Industry } from "@/lib/types";
 
 const INDUSTRY_SET = new Set<string>(INDUSTRIES);
+const UNCLASSIFIABLE_DEFENDANTS = new Set(["inc", "inc.", "llc", "ltd", "ltd.", "corp", "corp.", "company"]);
 
 export function parseIndustry(value: string | null | undefined): Industry {
   const cleanValue = value?.trim();
@@ -13,7 +14,7 @@ export function parseIndustry(value: string | null | undefined): Industry {
 }
 
 export async function classifyIndustry(defendant: string, caseName = ""): Promise<Industry> {
-  if (!defendant.trim()) {
+  if (isUnclassifiableDefendant(defendant)) {
     return "Other";
   }
 
@@ -24,16 +25,18 @@ export async function classifyIndustry(defendant: string, caseName = ""): Promis
   }
 
   const prompt = `Classify the company into one of these categories:
-[Ecommerce, SaaS, Healthcare, Finance, Education, Hospitality, Government, Other]
+[Retail, Real Estate, Healthcare, Hospitality, Financial, Education, Technology, Ecommerce, Travel, Other]
 
 Company: ${defendant}
 Case: ${caseName}
 
-Return ONLY one category.`;
+Return ONLY one category.
+If the company cannot be identified, return Other.
+If the defendant is a person name, return Other.`;
 
   const models = Array.from(
     new Set(
-      [process.env.GEMINI_MODEL, "gemini-1.5-flash", "gemini-flash-lite-latest", "gemini-flash-latest"].filter(
+      [process.env.GEMINI_MODEL, "gemini-3.5-flash-lite", "gemini-flash-lite-latest"].filter(
         Boolean
       )
     )
@@ -71,4 +74,19 @@ Return ONLY one category.`;
   }
 
   return "Other";
+}
+
+export function isUnclassifiableDefendant(defendant: string): boolean {
+  const value = defendant.trim();
+
+  if (!value) {
+    return true;
+  }
+
+  if (UNCLASSIFIABLE_DEFENDANTS.has(value.toLowerCase())) {
+    return true;
+  }
+
+  const words = value.split(/\s+/);
+  return words.length === 1 && UNCLASSIFIABLE_DEFENDANTS.has(value.toLowerCase());
 }
