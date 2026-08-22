@@ -27,14 +27,16 @@ export default async function CaseDetail({ params }: PageProps) {
   const related = await repository.relatedCases(caseRecord.district, caseRecord.id);
 
   return (
-    <main className="mx-auto w-[min(1520px,calc(100%-48px))] py-8 pb-14 max-[760px]:w-[min(100%-28px,100%)]">
-      <section className="border-b border-stone-300 pb-14">
+    <main className="mx-auto w-[min(1240px,calc(100%-40px))] py-6 pb-12 max-[760px]:w-[min(100%-28px,100%)]">
+      <section className="border-b border-stone-300 pb-10">
         <div className="min-w-0">
-          <p className="mb-4 text-sm font-bold uppercase tracking-normal text-red-700">Federal ADA website filing</p>
-          <h1 className="max-w-6xl text-5xl font-black leading-[0.98] tracking-normal text-gray-950 max-[760px]:text-4xl min-[1200px]:text-7xl">
+          <p className="mb-3 text-[13px] font-bold uppercase tracking-[0.06em] text-red-700">
+            Federal ADA website filing
+          </p>
+          <h1 className="max-w-[1050px] text-[clamp(2.5rem,4vw,4rem)] font-black leading-[1.04] tracking-normal text-gray-950">
             {caseRecord.case_name}
           </h1>
-          <div className="mt-7 flex flex-wrap gap-x-8 gap-y-3 text-xl text-stone-600 max-[760px]:text-base">
+          <div className="mt-6 flex flex-wrap gap-x-7 gap-y-2 text-lg text-stone-600 max-[760px]:text-base">
             <MetaItem label="Filed" value={caseRecord.date_filed} />
             <MetaItem label="District" value={caseRecord.district} />
             <MetaItem label="Case number" value={caseRecord.case_number} mono />
@@ -42,23 +44,23 @@ export default async function CaseDetail({ params }: PageProps) {
         </div>
       </section>
 
-      <section className="mt-14 grid grid-cols-[minmax(0,1fr)_minmax(320px,440px)] gap-14 max-[1040px]:grid-cols-1 max-[760px]:mt-8">
-        <div className="grid gap-10">
-          <Card className="rounded-[22px] border-[#d1d8e0] shadow-sm">
-            <CardHeader className="p-9 pb-3 max-[760px]:p-6 max-[760px]:pb-2">
-              <CardTitle className="text-2xl font-bold uppercase text-stone-600">Parties</CardTitle>
+      <section className="mt-10 grid grid-cols-[minmax(0,1fr)_360px] gap-10 max-[1040px]:grid-cols-1 max-[760px]:mt-7">
+        <div className="grid gap-8">
+          <Card className="rounded-2xl border-[#d1d8e0] shadow-sm">
+            <CardHeader className="p-7 pb-2 max-[760px]:p-5 max-[760px]:pb-2">
+              <CardTitle className="text-xl font-bold uppercase text-stone-600">Parties</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-10 p-9 pt-5 max-[760px]:grid-cols-1 max-[760px]:p-6">
+            <CardContent className="grid grid-cols-2 gap-8 p-7 pt-5 max-[760px]:grid-cols-1 max-[760px]:p-5">
               <PartyFact label="Defendant" value={caseRecord.defendant} />
               <PartyFact label="Plaintiff" value={caseRecord.plaintiff} />
             </CardContent>
           </Card>
 
-          <Card className="rounded-[22px] border-[#d1d8e0] shadow-sm">
-            <CardHeader className="p-9 pb-3 max-[760px]:p-6 max-[760px]:pb-2">
-              <CardTitle className="text-2xl font-bold uppercase text-stone-600">Filing facts</CardTitle>
+          <Card className="rounded-2xl border-[#d1d8e0] shadow-sm">
+            <CardHeader className="p-7 pb-2 max-[760px]:p-5 max-[760px]:pb-2">
+              <CardTitle className="text-xl font-bold uppercase text-stone-600">Filing facts</CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-x-16 gap-y-7 p-9 pt-5 max-[760px]:grid-cols-1 max-[760px]:p-6">
+            <CardContent className="grid grid-cols-2 gap-x-12 gap-y-6 p-7 pt-5 max-[760px]:grid-cols-1 max-[760px]:p-5">
               <DetailFact label="Court" value={caseRecord.district} />
               <DetailFact label="Date filed" value={caseRecord.date_filed} />
               <DetailFact label="Case number" value={caseRecord.case_number} mono />
@@ -84,9 +86,9 @@ function MetaItem({ label, value, mono = false }: { label: string; value: string
 
 function PartyFact({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid gap-4">
-      <span className="text-sm font-medium uppercase tracking-normal text-stone-500">{label}</span>
-      <strong className="text-3xl leading-tight text-gray-950 max-[760px]:text-2xl">{value}</strong>
+    <div className="grid gap-3">
+      <span className="text-[13px] font-medium uppercase tracking-[0.04em] text-stone-500">{label}</span>
+      <strong className="text-2xl leading-tight text-gray-950 max-[760px]:text-xl">{value}</strong>
     </div>
   );
 }
@@ -94,8 +96,8 @@ function PartyFact({ label, value }: { label: string; value: string }) {
 function DetailFact({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="grid gap-2">
-      <span className="text-sm font-medium uppercase tracking-normal text-stone-500">{label}</span>
-      <strong className={mono ? "font-mono text-2xl font-medium text-gray-950" : "text-2xl font-normal text-gray-950"}>
+      <span className="text-[13px] font-medium uppercase tracking-[0.04em] text-stone-500">{label}</span>
+      <strong className={mono ? "font-mono text-xl font-medium text-gray-950" : "text-xl font-normal text-gray-950"}>
         {value}
       </strong>
     </div>
@@ -105,9 +107,9 @@ function DetailFact({ label, value, mono = false }: { label: string; value: stri
 function DetailLink({ label, href, value }: { label: string; href: string; value: string }) {
   return (
     <div className="grid gap-2">
-      <span className="text-sm font-medium uppercase tracking-normal text-stone-500">{label}</span>
+      <span className="text-[13px] font-medium uppercase tracking-[0.04em] text-stone-500">{label}</span>
       <a
-        className="inline-flex w-fit items-center gap-2 text-2xl font-medium text-blue-950"
+        className="inline-flex w-fit items-center gap-2 text-xl font-medium text-blue-950"
         href={href}
         target="_blank"
         rel="noreferrer"
@@ -121,23 +123,23 @@ function DetailLink({ label, href, value }: { label: string; href: string; value
 
 function RelatedCasesCard({ district, related }: { district: string; related: CaseRecord[] }) {
   return (
-    <Card className="self-start rounded-[22px] border-[#d1d8e0] shadow-sm">
-      <CardHeader className="p-8 pb-2">
-        <CardTitle className="text-lg font-bold uppercase tracking-normal text-stone-600">
+    <Card className="self-start rounded-2xl border-[#d1d8e0] shadow-sm">
+      <CardHeader className="p-7 pb-2">
+        <CardTitle className="text-base font-bold uppercase tracking-[0.04em] text-stone-600">
           Recent related filings in {district}
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-8 pt-4">
+      <CardContent className="p-7 pt-4">
         {related.length === 0 ? (
           <p className="py-7 text-center text-sm text-stone-500">No related cases in this district yet.</p>
         ) : (
           <ul>
-            {related.map((item) => (
-              <li key={item.id} className="border-b border-stone-200 py-4 first:pt-0 last:border-b-0 last:pb-0">
-                <Link className="text-xl font-medium leading-snug text-blue-950" href={`/case/${item.id}`}>
+            {related.slice(0, 5).map((item) => (
+              <li key={item.id} className="border-b border-stone-200 py-3.5 first:pt-0 last:border-b-0 last:pb-0">
+                <Link className="text-lg font-medium leading-snug text-blue-950" href={`/case/${item.id}`}>
                   {item.defendant}
                 </Link>
-                <p className="mt-1 text-base text-stone-500">
+                <p className="mt-1 text-sm text-stone-500">
                   {item.date_filed} · {item.district}
                 </p>
               </li>
