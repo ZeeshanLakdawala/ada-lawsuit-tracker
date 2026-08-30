@@ -97,5 +97,20 @@ function extractCaseRecordsFromValue(value: unknown): unknown[] {
     return directCases;
   }
 
+  if (looksLikeCaseRecord(record)) {
+    return [record];
+  }
+
   return Object.values(record).flatMap((item) => extractCaseRecordsFromValue(item));
+}
+
+function looksLikeCaseRecord(record: Record<string, unknown>) {
+  return (
+    "case_name" in record ||
+    "defendant_name" in record ||
+    "plaintiff_name" in record ||
+    "docket_number" in record ||
+    "case_number" in record ||
+    "case_url" in record
+  );
 }

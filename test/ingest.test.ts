@@ -62,8 +62,12 @@ describe("ingestCases", () => {
     expect(extractCaseRecords({ cases: [validRecord] })).toEqual([validRecord]);
   });
 
+  it("extracts cases from a raw array of case records", async () => {
+    expect(extractCaseRecords([validRecord])).toEqual([validRecord]);
+  });
+
   it("ignores payload items without cases arrays", async () => {
-    expect(extractCaseRecords([validRecord])).toEqual([]);
+    expect(extractCaseRecords([{ input: { url: "https://example.com" } }])).toEqual([]);
   });
 
   it("ingests Bright Data page results with nested cases arrays", async () => {
