@@ -75,10 +75,27 @@ export async function ingestCases(
 
 export function extractCaseRecords(payload: unknown): unknown[] {
   if (!Array.isArray(payload)) {
+    return extractCaseRecordsFromValue(payload);
+  }
+
+  return payload.flatMap((item) => extractCaseRecordsFromValue(item));
+}
+
+function extractCaseRecordsFromValue(value: unknown): unknown[] {
+  if (Array.isArray(value)) {
+    return value.flatMap((item) => extractCaseRecordsFromValue(item));
+  }
+
+  if (!value || typeof value !== "object") {
     return [];
   }
 
-  return payload.flatMap((item) =>
-    item && typeof item === "object" && "cases" in item && Array.isArray(item.cases) ? item.cases : []
-  );
+  const record = value as Record<string, unknown>;
+  const directCases = record.cases;
+
+  if (Array.isArray(directCases)) {
+    return directCases;
+  }
+
+  return Object.values(record).flatMap((item) => extractCaseRecordsFromValue(item));
 }

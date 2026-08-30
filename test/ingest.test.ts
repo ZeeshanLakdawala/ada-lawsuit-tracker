@@ -58,6 +58,10 @@ describe("ingestCases", () => {
     expect(extractCaseRecords([{ cases: [validRecord] }])).toEqual([validRecord]);
   });
 
+  it("extracts cases from a top-level webhook wrapper object", async () => {
+    expect(extractCaseRecords({ cases: [validRecord] })).toEqual([validRecord]);
+  });
+
   it("ignores payload items without cases arrays", async () => {
     expect(extractCaseRecords([validRecord])).toEqual([]);
   });
