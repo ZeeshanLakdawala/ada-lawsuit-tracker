@@ -82,6 +82,10 @@ export function extractCaseRecords(payload: unknown): unknown[] {
 }
 
 function extractCaseRecordsFromValue(value: unknown): unknown[] {
+  if (typeof value === "string") {
+    return parseEmbeddedJson(value);
+  }
+
   if (Array.isArray(value)) {
     return value.flatMap((item) => extractCaseRecordsFromValue(item));
   }
@@ -102,6 +106,20 @@ function extractCaseRecordsFromValue(value: unknown): unknown[] {
   }
 
   return Object.values(record).flatMap((item) => extractCaseRecordsFromValue(item));
+}
+
+function parseEmbeddedJson(value: string): unknown[] {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return [];
+  }
+
+  try {
+    return extractCaseRecordsFromValue(JSON.parse(trimmed));
+  } catch {
+    return [];
+  }
 }
 
 function looksLikeCaseRecord(record: Record<string, unknown>) {

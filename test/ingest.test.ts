@@ -66,6 +66,10 @@ describe("ingestCases", () => {
     expect(extractCaseRecords([validRecord])).toEqual([validRecord]);
   });
 
+  it("extracts cases from embedded JSON strings", async () => {
+    expect(extractCaseRecords(JSON.stringify([{ cases: [validRecord] }]))).toEqual([validRecord]);
+  });
+
   it("ignores payload items without cases arrays", async () => {
     expect(extractCaseRecords([{ input: { url: "https://example.com" } }])).toEqual([]);
   });
