@@ -30,7 +30,7 @@ The source link points back to the underlying public filing record when one is a
 
 ## Features
 
-- Bright Data webhook ingestion for CourtListener / RECAP result payloads.
+- Scheduled Bright Data ingestion for CourtListener / RECAP result payloads.
 - Record validation and cleaning.
 - Duplicate protection using the case number.
 - Gemini-backed industry classification with a fixed set of supported industries.
@@ -41,7 +41,7 @@ The source link points back to the underlying public filing record when one is a
 - Ranked views for plaintiffs, federal districts, and industries.
 - Related filings grouped by federal district.
 - Accessibility-themed favicon and accessible labels for key controls.
-- Automated tests for cleaning, ingestion, classification, URL parameters, Bright Data sync, and the ingest API.
+- Automated tests for cleaning, ingestion, classification, URL parameters, and Bright Data sync.
 
 ## How it works
 
@@ -50,14 +50,15 @@ CourtListener / RECAP
         |
         v
 Bright Data collector
-        |
-        v
-POST /api/ingest
-        |
-        +--> parse and repair JSON
-        +--> validate and clean each record
-        +--> classify industry with Gemini
-        +--> skip duplicate case numbers
+         |
+         v
+Vercel Cron: /api/cron/brightdata-sync
+         |
+         +--> request page 1, then continue page by page
+         +--> parse Bright Data JSON
+         +--> validate and clean each record
+         +--> classify industry with Gemini
+         +--> skip duplicate case numbers
         +--> insert new rows into Supabase
         |
         v
@@ -67,7 +68,7 @@ Next.js tracker reads Supabase
 Table, case detail, metrics, and analytics
 ```
 
-When a webhook batch contains only new records, the ingest route schedules a continuation in the background. The continuation requests the next Bright Data page and stops when it finds a duplicate, reaches an empty page, or reaches the configured page cap. This supports daily updates without repeatedly scanning the full archive.
+The scheduled route requests page 1 and continues one page at a time. It stops when it finds a duplicate, reaches an empty page, or reaches the configured page cap.
 
 ## Architecture
 
@@ -77,11 +78,10 @@ This is a Next.js App Router application.
 | --- | --- |
 | `app/page.tsx` | Tracker table, filters, metrics, analytics, and settlement context |
 | `app/case/[id]/page.tsx` | Case detail page and related filings |
-| `app/api/ingest/route.ts` | Bright Data webhook entry point |
+| `app/api/cron/brightdata-sync/route.ts` | Daily Bright Data sync entry point |
 | `components/` | Table, filter, card, ranked list, and pagination UI |
 | `lib/ingest.ts` | Parsing, validation, cleaning, classification, and insert flow |
-| `lib/ingest-handler.ts` | Webhook parsing and HTTP response handling |
-| `lib/brightdata-sync.ts` | Follow-up page collection after a new batch |
+| `lib/brightdata-sync.ts` | Page collection and duplicate-aware sync |
 | `lib/cases-repository.ts` | Supabase repository and metrics queries |
 | `lib/cleaning.ts` | Field normalization and record validation |
 | `lib/industry.ts` | Industry labels and Gemini classification |
@@ -118,6 +118,9 @@ Set the required values:
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your-server-only-key
 GEMINI_API_KEY=your-gemini-key
+BRIGHTDATA_API_TOKEN=your-brightdata-token
+BRIGHTDATA_COLLECTOR_ID=your-collector-id
+CRON_SECRET=your-cron-secret
 ```
 
 Run `supabase/schema.sql` in the Supabase SQL editor, then start the app:
@@ -130,13 +133,7 @@ Open `http://localhost:3000`.
 
 ## Ingestion setup
 
-Set the Bright Data collector webhook URL to:
-
-```text
-https://YOUR-VERCEL-DOMAIN/api/ingest
-```
-
-Each page-level result must contain a `cases` array. Each case must include:
+The scheduled sync calls the Bright Data collector API directly. Each page-level result must contain a `cases` array. Each case must include:
 
 ```text
 case_name
@@ -147,8 +144,6 @@ date_filed
 docket_number
 case_url
 ```
-
-The endpoint accepts Bright Data's raw JSON output, rejects invalid records, skips duplicate case numbers, and returns counts for inserted, skipped, and rejected records.
 
 For the daily CourtListener run, use page 1 as the starting input:
 
@@ -161,14 +156,12 @@ Add these values for the scripts:
 ```bash
 BRIGHTDATA_API_TOKEN=your-brightdata-token
 BRIGHTDATA_COLLECTOR_ID=your-collector-id
-INGEST_URL=https://YOUR-VERCEL-DOMAIN/api/ingest
 ```
 
-Run a collection and ingest the result:
+The Vercel cron runs this collection and ingestion in Production each morning at 9:00 AM IST.
 
 ```bash
 pnpm brightdata:trigger -- --start=1 --pages=1
-pnpm brightdata:run-ingest -- --start=1 --pages=1
 ```
 
 Useful maintenance commands:
@@ -187,8 +180,8 @@ pnpm db:reclassify-cases -- --all --limit=100 --delay-ms=4200
 2. Set the production environment variables from `.env.local` in Vercel.
 3. Use `pnpm install` for installation if Vercel does not detect pnpm.
 4. Use `pnpm build` as the build command.
-5. Point Bright Data's webhook to the deployed `/api/ingest` route.
-6. Send one test record and confirm it appears in Supabase and the tracker.
+5. Set `CRON_SECRET` in Production so Vercel Cron can authenticate the sync route.
+6. Confirm the scheduled route writes new rows to Supabase and the tracker.
 
 Keep the Supabase service role key in server-side environment variables. Never expose it through `NEXT_PUBLIC_*` variables or commit it to the repository.
 
@@ -197,14 +190,12 @@ Keep the Supabase service role key in server-side environment variables. Never e
 - Coverage depends on records returned by CourtListener / RECAP and Bright Data.
 - A docket record can be amended, delayed, sealed, or missing fields.
 - Industry classification depends on the available case text and Gemini's response.
-- The ingest endpoint does not currently provide application-level authentication. Add a signed webhook header, authenticated gateway, or Vercel access rule before using it for sensitive production workflows.
 - Settlement figures are references, not a complete settlement dataset.
 - Recent filing counts use `date_filed`, not the time a record entered Supabase.
 - The app is a tracker and research aid, not legal advice.
 
 ## Future improvements
 
-- Signed webhook authentication and replay protection.
 - Ingestion run history, source pages, and classification confidence.
 - A review queue for uncertain industry labels.
 - Source freshness and last successful sync status in the UI.

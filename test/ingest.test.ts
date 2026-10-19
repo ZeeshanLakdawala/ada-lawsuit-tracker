@@ -58,7 +58,7 @@ describe("ingestCases", () => {
     expect(extractCaseRecords([{ cases: [validRecord] }])).toEqual([validRecord]);
   });
 
-  it("extracts cases from a top-level webhook wrapper object", async () => {
+  it("extracts cases from a top-level Bright Data wrapper object", async () => {
     expect(extractCaseRecords({ cases: [validRecord] })).toEqual([validRecord]);
   });
 
