@@ -1,5 +1,19 @@
 # ADA Website Lawsuit Tracker
 
+## Project status: discontinued
+
+This project is no longer actively maintained. The existing website and code remain available to run. Automated data collection depends on Bright Data API access, so scheduled updates may stop when those credentials expire or change. Anyone who continues the project needs to provide their own service credentials.
+
+### Run the existing website
+
+1. Install Node.js and pnpm, then run `pnpm install`.
+2. Copy `.env.example` to `.env.local` and add Supabase and Gemini credentials. Add Bright Data credentials to enable data collection.
+3. Run `supabase/schema.sql` in the Supabase SQL editor.
+4. Run `pnpm dev` and open `http://localhost:3000`.
+5. To collect new records manually, set `BRIGHTDATA_API_TOKEN` and `BRIGHTDATA_COLLECTOR_ID`, then run `pnpm brightdata:trigger -- --start=1 --pages=1`.
+
+See [Local setup](#local-setup), [Ingestion setup](#ingestion-setup), and [Deployment on Vercel](#deployment-on-vercel) for full configuration details.
+
 ADA Website Lawsuit Tracker is a public-facing tracker for federal lawsuits involving website accessibility. It collects filing data, classifies defendants by industry, stores records, and presents the result as a searchable table with filing metrics and docket patterns.
 
 ## Why this exists
